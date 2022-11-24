@@ -3,7 +3,7 @@ import sys
 import random
 import numpy as np
 from scipy.misc import imresize
-from utils import *
+from misc.utils import *
 from PIL import Image
 from copy import deepcopy
 import tensorflow as tf
