@@ -5,7 +5,7 @@ from stable_baselines3 import A2C
 from stable_baselines3.common.env_util import make_atari_env
 from stable_baselines3.common.vec_env import VecFrameStack
 from stable_baselines3.common.env_util import make_vec_env
-import nl_wrapper as nlw
+import environment.nl_wrapper as nlw
 # Parallel environments
 #initial environment
 env = make_atari_env("BreakoutNoFrameskip-v4", n_envs=4, seed=0)
@@ -20,7 +20,6 @@ model = PPO("CnnPolicy", env, verbose=1, device="cpu")
 model.learn(total_timesteps=25000)
 model.save("ppo_cartpole")
 
-# del model # remove to demonstrate saving and loading
 
 model = PPO.load("ppo_cartpole")
 
