@@ -21,18 +21,16 @@ class ObservationWrapper(gym.ObservationWrapper):
         return obs
     
 class RewardWrapper(gym.RewardWrapper):
-    def __init__(self, env, trajectory, learn_model: learn_model):
+    def __init__(self, env):
         super().__init__(env)
-        self.trajectory = trajectory
-        self.learn_model = learn_model
+        #self.trajectory = trajectory
+        #self.learn_model = learn_model
     
     def reward(self, rew):
         # modify rew 
-        return rew + self.get_nl_reward(self.trajectory)
-    
-    def get_nl_reward(trajectory):
-        # get reward from NL
-        return learn_model.get_nl_reward(trajectory)
+        #return rew + learn_model.get_nl_reward(self.trajectory)
+        return max(1, rew + learn_model.get_nl_reward(self.trajectory))
+        return 84
 
 
     
