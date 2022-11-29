@@ -1,14 +1,10 @@
 import torch
 import numpy as np
 from transformers import BertTokenizer
+from transformers import BertForSequenceClassification
 
 from torch.optim import Adam
 from tqdm import tqdm
-
-tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
-labels = {'unrelated':0,
-          'related':1,
-          }
 
 class Dataset(torch.utils.data.Dataset):
 

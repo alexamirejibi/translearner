@@ -4,6 +4,7 @@ import torch
 import pickle
 import string
 import os
+from transformers import BertTokenizer
 
 def load_actions(data_dir):
     clip_to_actions = {}
@@ -15,6 +16,7 @@ def load_actions(data_dir):
             actions = map(eval, parts[1:])
             clip_to_actions[clip_id] = list(actions)
     return clip_to_actions
+
 
 def load_annotations_file(filename):
     clip_ids = []
@@ -29,6 +31,19 @@ def load_annotations_file(filename):
             clip_ids.append(clip_id.strip())
             sentences.append(sentence)
     return clip_ids, sentences
+
+
+
+
+# tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
+# labels = {'unrelated':0,
+#           'related':1,
+#           }
+
+# tokenizer = BertTokenizer.from_pretrained(
+#     'bert-base-uncased',
+#     do_lower_case = True
+#     )
 
     # for i in data[0]:
     #     print(i + '\n')

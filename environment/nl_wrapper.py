@@ -1,6 +1,6 @@
 import gym
 import numpy as np
-from language import learn_model
+from misc import learn_model
 
 class BasicWrapper(gym.Wrapper):
     def __init__(self, env):
