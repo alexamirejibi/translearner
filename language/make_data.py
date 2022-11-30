@@ -1,28 +1,14 @@
 import preprocessing as pre
 import pickle
-from transformers import BertTokenizer
+from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer
 import random
+from shorten_trajectory import shorten_trajectory
+import torch
+import evaluate
 
-tokenizer = BertTokenizer.from_pretrained("bert-base-cased")
 training_data = 'data/train_lang_data.pkl'
 sentence_action_pairs = []
 action_words = ['STAND', 'JUMP', 'UP', 'RIGHT', 'LEFT', 'DOWN', 'UP-RIGHT', 'UP-LEFT', 'DOWN-RIGHT', 'DOWN-LEFT', 'JUMP UP', 'JUMP RIGHT', 'JUMP LEFT', 'JUMP DOWN', 'JUMP UP-RIGHT', 'JUMP UP-LEFT', 'JUMP DOWN-RIGHT', 'JUMP DOWN-LEFT']
-
-
-def shorten(trajectory: list):
-    new_trajectory = []
-    # remove 0's from the start of the trajectory
-    for i in range(len(trajectory)):
-        if trajectory[i] == 0:
-            trajectory.pop(i)
-        else:
-            break
-
-    for i in range(len(trajectory)):
-        if i == 0 or trajectory[i] != new_trajectory[-1]:
-            new_trajectory.append(trajectory[i])
-    return new_trajectory
-
 
 with open(training_data, 'rb') as f:
     encoded_sentence_acton_pairs = []
@@ -33,15 +19,12 @@ with open(training_data, 'rb') as f:
         clip_id = dict['clip_id']
         sentence = dict['sentence']
         trajectory = clip_to_actions[clip_id]
-        trajectory = [action_words[x] + ',' for x in trajectory if (trajectory.count(trajectory[x] / len(trajectory) > 0.1))]
-        trajectory = shorten(trajectory)
+        trajectory = shorten_trajectory(trajectory)
+        trajectory = [action_words[x] for x in trajectory if (trajectory.count(x) / len(trajectory)) > 0.1]
         # combine all actions into one string
-        trajectory = ' '.join(trajectory)
+        trajectory = ', '.join(trajectory)
         if len(trajectory) > 0:
-           # encoded_dict = tokenizer(actions, sentence)
             sentence_action_pairs += [{'sentence': sentence, 'trajectory': trajectory, 'clip_id': clip_id}]
-            # encoded_sentence_acton_pairs += encoded_dict
-            # decoded_sentence_acton_pairs += tokenizer.decode(encoded_dict["input_ids"])
 
         #print(clip_id + '\t' + sentence + '\t' + str(actions))
     for i in range(10):
@@ -53,14 +36,17 @@ with open(training_data, 'rb') as f:
     # for i in sentence_action_pairs:
     #     if len(i['trajectory']) > max:
     #         max = len(i['trajectory'])
-    #         max_traj = i
+    #         max_traj = i[]
     #     min = len(i['trajectory']) if len(i['trajectory']) < min else min
     # print(str(max) + '\t' + max_traj['trajectory'] + '\t' + max_traj['sentence'])
     # print(decoded_sentence_acton_pairs[1])
 
-    # save sentence_action_pairs to file
-    with open('data/sentence_action_pairs.pkl', 'wb') as f:
-        pickle.dump(sentence_action_pairs, f)
+# save sentence_action_pairs to file
+
+with open('data/sentence_action_pairs.pkl', 'wb') as f:
+    pickle.dump(sentence_action_pairs, f)
+
+
 
 # TODO reduce the length of action strings? 
 trajectory = ['stand', 'fire', 'up', 'move right', 'move left', 'move down', 'move up and to the right', 'move up and to the left',

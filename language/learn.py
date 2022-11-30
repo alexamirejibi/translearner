@@ -34,6 +34,7 @@ sequence_0 = "The company HuggingFace is based in New York City"
 sequence_1 = "Apples are especially bad for your health"
 sequence_2 = "HuggingFace's headquarters are situated in Manhattan"
 
+
 related = tokenizer(sequence_0, sequence_2, return_tensors="pt")
 unrelated = tokenizer(sequence_0, sequence_1, return_tensors="pt")
 
