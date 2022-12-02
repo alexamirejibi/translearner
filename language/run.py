@@ -1,11 +1,6 @@
-import preprocessing as pre
 import pickle
 from transformers import DistilBertForSequenceClassification, Trainer, TrainingArguments, DistilBertTokenizerFast
 import random
-from shorten_trajectory import shorten_trajectory
-import torch
-import evaluate
-import numpy as np
 from sklearn.model_selection import train_test_split
 from dataset import AnnotatedTrajectoryDataset
 

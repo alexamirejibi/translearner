@@ -1,5 +1,4 @@
 
-
 def shorten_trajectory(trajectory):
     new_trajectory = []
     # remove 0's from the start of the trajectory

@@ -1,11 +1,11 @@
 import torch
 import numpy as np
-from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification
+# from transformers import DistilBertTokenizerFast, DistilBertForSequenceClassification
 
-from torch.optim import Adam
-from tqdm import tqdm
+# from torch.optim import Adam
+# from tqdm import tqdm
 
-from sklearn.model_selection import train_test_split
+# from sklearn.model_selection import train_test_split
 
 # https://huggingface.co/transformers/v3.2.0/custom_datasets.html
 # LEFT OFF TODO: I was on this page, trying to set up this custom dataset class.
