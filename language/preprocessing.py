@@ -4,7 +4,6 @@ import torch
 import pickle
 import string
 import os
-from transformers import BertTokenizer
 
 def load_actions(data_dir):
     clip_to_actions = {}

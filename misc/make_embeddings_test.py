@@ -1,4 +1,3 @@
-from transformers import BertTokenizer, BertModel
 import torch
 from sentence_transformers import SentenceTransformer
 model = SentenceTransformer('all-MiniLM-L6-v2')
