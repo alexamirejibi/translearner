@@ -1,10 +1,8 @@
-import preprocessing as pre
+import language.preprocessing as pre
 import pickle
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer
 import random
-from shorten_trajectory import shorten_trajectory
-import torch
-import evaluate
+from language.shorten_trajectory import shorten_trajectory
+
 
 training_data = 'data/train_lang_data.pkl'
 sentence_action_pairs = []
