@@ -3,10 +3,10 @@ from transformers import DistilBertForSequenceClassification, Trainer, TrainingA
 import random
 from sklearn.model_selection import train_test_split
 from dataset import AnnotatedTrajectoryDataset
-from datasets import load_metric
+import evaluate
 import numpy as np
-from huggingface_hub import notebook_login
-
+import torch
+from datasets import load_metric
 
 
 sentence_trajectory_pairs = []
@@ -33,15 +33,23 @@ all_labels = pos_labels + neg_labels
 
 assert len(all_labels) == len(all_pairs)
 
+for l in all_labels:
+    assert l in [0, 1]
+
 train_dataset, test_dataset, train_labels, test_labels = train_test_split(all_pairs, all_labels, test_size=0.3, random_state=42)
 val_dataset, test_dataset, val_labels, test_labels = train_test_split(test_dataset, test_labels, test_size=0.5, random_state=42)
 
 train_sentences = [i['sentence'] for i in train_dataset]
 train_trajectories = [i['trajectory'] for i in train_dataset]
+
 val_sentences = [i['sentence'] for i in val_dataset]
 val_trajectories = [i['trajectory'] for i in val_dataset]
 test_sentences = [i['sentence'] for i in test_dataset]
 test_trajectories = [i['trajectory'] for i in test_dataset]
+
+assert len(train_sentences) == len(train_trajectories)
+assert len(val_sentences) == len(val_trajectories)
+assert len(test_sentences) == len(test_trajectories)
 
 tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
 
@@ -62,45 +70,26 @@ test_dataset = AnnotatedTrajectoryDataset(test_encodings, test_labels)
 # print(train_pairs[0])
 # print(train_pairs.get_batch_labels(0))
 
-model = DistilBertForSequenceClassification.from_pretrained("distilbert-base-uncased")
+# model = DistilBertForSequenceClassification.from_pretrained('model_learn_pretrained')
+#tokenizer = DistilBertTokenizerFast.from_pretrained('results')
+model = DistilBertForSequenceClassification.from_pretrained("model_learn_pretrained")
 
-def compute_metrics(eval_pred):
-   load_accuracy = load_metric("accuracy")
-   load_f1 = load_metric("f1")
-  
-   logits, labels = eval_pred
-   predictions = np.argmax(logits, axis=-1)
-   accuracy = load_accuracy.compute(predictions=predictions, references=labels)["accuracy"]
-   f1 = load_f1.compute(predictions=predictions, references=labels)["f1"]
-   return {"accuracy": accuracy, "f1": f1}
+tst = tokenizer('go left and then jump', 'LEFT, JUMP', truncation=True, padding=True, return_tensors='pt')
 
-notebook_login()
-data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+with torch.no_grad():
+    logits = model(**tst).logits
 
-training_args = TrainingArguments(
-    output_dir='./trajectory-classifier',          # output directory
-    num_train_epochs=4,              # total number of training epochs
-    per_device_train_batch_size=16,  # batch size per device during training
-    per_device_eval_batch_size=64,   # batch size for evaluation
-    warmup_steps=500,                # number of warmup steps for learning rate scheduler
-    weight_decay=0.01,               # strength of weight decay
-    logging_dir='./logs',            # directory for storing logs
-    logging_steps=10,
-    push_to_hub=True,
+load_accuracy = load_metric("accuracy")
+load_f1 = load_metric("f1")
 
-)
+logits, labels = eval_pred
+predictions = np.argmax(logits, axis=-1)
+accuracy = load_accuracy.compute(predictions=predictions, references=labels)["accuracy"]
+f1 = load_f1.compute(predictions=predictions, references=labels)["f1"]
+predicted_class_id = logits.argmax().item()
+model.config.id2label[predicted_class_id]
 
-trainer = Trainer(
-    model=model,                         # the instantiated 🤗 Transformers model to be trained
-    args=training_args,                  # training arguments, defined above
-    train_dataset=train_dataset,         # training dataset
-    eval_dataset=val_dataset,             # evaluation dataset
-    data_collator=data_collator,
-    tokenizer=tokenizer,
-    compute_metrics=compute_metrics
 
-)
 
-trainer.train(resume_from_checkpoint='/content/rlnlp/results/checkpoint-2000')
-trainer.save_model('/content/gdrive/My Drive/')
-trainer.evaluate()
+
+

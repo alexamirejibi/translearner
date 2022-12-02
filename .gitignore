@@ -2,3 +2,6 @@
 data/test_lang_data.pkl
 data/train_lang_data.pkl
 bert2bert/pytorch_model.bin
+model_learn_pretrained/config.json
+model_learn_pretrained/pytorch_model.bin
+model_learn_pretrained/training_args.bin
