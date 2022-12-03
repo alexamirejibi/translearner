@@ -78,13 +78,15 @@ data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
 training_args = TrainingArguments(
     output_dir='results',          # output directory
-    num_train_epochs=10,              # total number of training epochs
+    num_train_epochs=15,              # total number of training epochs
     per_device_train_batch_size=16,  # batch size per device during training
     per_device_eval_batch_size=64,   # batch size for evaluation
     warmup_steps=500,                # number of warmup steps for learning rate scheduler
     weight_decay=0.01,               # strength of weight decay
     logging_dir='./logs',            # directory for storing logs
     logging_steps=10,
+    push_to_hub=True,
+
 )
 
 trainer = Trainer(
@@ -95,7 +97,8 @@ trainer = Trainer(
     data_collator=data_collator,
     tokenizer=tokenizer,
     compute_metrics=compute_metrics
-
 )
 
+trainer.train()
 trainer.push_to_hub("alexamiredjibi/trajectory-classifier")
+trainer.evaluate(test_dataset)
