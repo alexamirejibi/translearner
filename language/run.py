@@ -62,7 +62,7 @@ test_dataset = AnnotatedTrajectoryDataset(test_encodings, test_labels)
 # print(train_pairs[0])
 # print(train_pairs.get_batch_labels(0))
 
-model = DistilBertForSequenceClassification.from_pretrained("distilbert-base-uncased")
+model = DistilBertForSequenceClassification.from_pretrained("model_learn_pretrained")
 
 def compute_metrics(eval_pred):
    load_accuracy = load_metric("accuracy")
@@ -74,20 +74,17 @@ def compute_metrics(eval_pred):
    f1 = load_f1.compute(predictions=predictions, references=labels)["f1"]
    return {"accuracy": accuracy, "f1": f1}
 
-notebook_login()
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
 training_args = TrainingArguments(
-    output_dir='./trajectory-classifier',          # output directory
-    num_train_epochs=4,              # total number of training epochs
+    output_dir='results',          # output directory
+    num_train_epochs=10,              # total number of training epochs
     per_device_train_batch_size=16,  # batch size per device during training
     per_device_eval_batch_size=64,   # batch size for evaluation
     warmup_steps=500,                # number of warmup steps for learning rate scheduler
     weight_decay=0.01,               # strength of weight decay
     logging_dir='./logs',            # directory for storing logs
     logging_steps=10,
-    push_to_hub=True,
-
 )
 
 trainer = Trainer(
@@ -101,6 +98,4 @@ trainer = Trainer(
 
 )
 
-trainer.train(resume_from_checkpoint='/content/rlnlp/results/checkpoint-2000')
-trainer.save_model('/content/gdrive/My Drive/')
-trainer.evaluate()
+trainer.push_to_hub("alexamiredjibi/trajectory-classifier")

@@ -1,7 +1,7 @@
-import language.preprocessing as pre
+import preprocessing as pre
 import pickle
 import random
-from language.shorten_trajectory import shorten_trajectory
+from shorten_trajectory import shorten_trajectory
 
 
 training_data = 'data/train_lang_data.pkl'

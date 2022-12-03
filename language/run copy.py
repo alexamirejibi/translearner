@@ -1,5 +1,5 @@
 import pickle
-from transformers import DistilBertForSequenceClassification, Trainer, TrainingArguments, DistilBertTokenizerFast, DataCollatorWithPadding
+from transformers import DistilBertForSequenceClassification, Trainer, TrainingArguments, DistilBertTokenizerFast, DataCollatorWithPadding, pipeline
 import random
 from sklearn.model_selection import train_test_split
 from dataset import AnnotatedTrajectoryDataset
@@ -76,20 +76,30 @@ model = DistilBertForSequenceClassification.from_pretrained("model_learn_pretrai
 
 tst = tokenizer('go left and then jump', 'LEFT, JUMP', truncation=True, padding=True, return_tensors='pt')
 
-with torch.no_grad():
-    logits = model(**tst).logits
+training_args = TrainingArguments(
+    output_dir='alexamiredjibi/trajectory-classifier',          # output directory
+    num_train_epochs=10,              # total number of training epochs
+    per_device_train_batch_size=16,  # batch size per device during training
+    per_device_eval_batch_size=64,   # batch size for evaluation
+    warmup_steps=500,                # number of warmup steps for learning rate scheduler
+    weight_decay=0.01,               # strength of weight decay
+    logging_dir='./logs',            # directory for storing logs
+    logging_steps=10,
+    push_to_hub=True,
 
-load_accuracy = load_metric("accuracy")
-load_f1 = load_metric("f1")
+)
 
-logits, labels = eval_pred
-predictions = np.argmax(logits, axis=-1)
-accuracy = load_accuracy.compute(predictions=predictions, references=labels)["accuracy"]
-f1 = load_f1.compute(predictions=predictions, references=labels)["f1"]
-predicted_class_id = logits.argmax().item()
-model.config.id2label[predicted_class_id]
+trainer = Trainer(
+    model=model,                         # the instantiated 🤗 Transformers model to be trained
+    args=training_args,                  # training arguments, defined above
+    train_dataset=train_dataset,         # training dataset
+    eval_dataset=val_dataset,             # evaluation dataset
+    tokenizer=tokenizer,
+)
 
+data = ["go down and to the left", "DOWN LEFT"]
 
-
+specific_model = pipeline(model="alexamiredjibi/results")
+specific_model(data)
 
 
