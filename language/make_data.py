@@ -17,8 +17,8 @@ with open(training_data, 'rb') as f:
         clip_id = dict['clip_id']
         sentence = dict['sentence']
         trajectory = clip_to_actions[clip_id]
-        trajectory = shorten_trajectory(trajectory)
-        trajectory = [action_words[x] for x in trajectory if (trajectory.count(x) / len(trajectory)) > 0.1]
+        # trajectory = shorten_trajectory(trajectory)
+        trajectory = [action_words[x] for x in trajectory if (trajectory.count(x) / len(trajectory)) > 0.1 and x != 0]
         # combine all actions into one string
         trajectory = ', '.join(trajectory)
         if len(trajectory) > 0:
@@ -41,7 +41,7 @@ with open(training_data, 'rb') as f:
 
 # save sentence_action_pairs to file
 
-with open('data/sentence_action_pairs.pkl', 'wb') as f:
+with open('data/long_sentence_action_pairs.pkl', 'wb') as f:
     pickle.dump(sentence_action_pairs, f)
 
 

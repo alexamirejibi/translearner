@@ -72,34 +72,86 @@ test_dataset = AnnotatedTrajectoryDataset(test_encodings, test_labels)
 
 # model = DistilBertForSequenceClassification.from_pretrained('model_learn_pretrained')
 #tokenizer = DistilBertTokenizerFast.from_pretrained('results')
-model = DistilBertForSequenceClassification.from_pretrained("model_learn_pretrained")
+# model = DistilBertForSequenceClassification.from_pretrained("model_learn_pretrained")
 
-tst = tokenizer('go left and then jump', 'LEFT, JUMP', truncation=True, padding=True, return_tensors='pt')
+# tst = tokenizer('go left and then jump', 'LEFT, JUMP', truncation=True, padding=True, return_tensors='pt')
 
-training_args = TrainingArguments(
-    output_dir='alexamiredjibi/trajectory-classifier',          # output directory
-    num_train_epochs=10,              # total number of training epochs
-    per_device_train_batch_size=16,  # batch size per device during training
-    per_device_eval_batch_size=64,   # batch size for evaluation
-    warmup_steps=500,                # number of warmup steps for learning rate scheduler
-    weight_decay=0.01,               # strength of weight decay
-    logging_dir='./logs',            # directory for storing logs
-    logging_steps=10,
-    push_to_hub=True,
+# training_args = TrainingArguments(
+#     output_dir='alexamiredjibi/trajectory-classifier',          # output directory
+#     num_train_epochs=10,              # total number of training epochs
+#     per_device_train_batch_size=16,  # batch size per device during training
+#     per_device_eval_batch_size=64,   # batch size for evaluation
+#     warmup_steps=500,                # number of warmup steps for learning rate scheduler
+#     weight_decay=0.01,               # strength of weight decay
+#     logging_dir='./logs',            # directory for storing logs
+#     logging_steps=10,
+#     push_to_hub=True,
 
-)
+# )
 
-trainer = Trainer(
-    model=model,                         # the instantiated 🤗 Transformers model to be trained
-    args=training_args,                  # training arguments, defined above
-    train_dataset=train_dataset,         # training dataset
-    eval_dataset=val_dataset,             # evaluation dataset
-    tokenizer=tokenizer,
-)
+# trainer = Trainer(
+#     model=model,                         # the instantiated 🤗 Transformers model to be trained
+#     args=training_args,                  # training arguments, defined above
+#     train_dataset=train_dataset,         # training dataset
+#     eval_dataset=val_dataset,             # evaluation dataset
+#     tokenizer=tokenizer,
+# )
 
-data = ["go down and to the left", "DOWN LEFT"]
+def compute_metrics(eval_pred):
+   load_accuracy = load_metric("accuracy")
+   load_f1 = load_metric("f1")
+  
+   logits, labels = eval_pred
+   predictions = np.argmax(logits, axis=-1)
+   accuracy = load_accuracy.compute(predictions=predictions, references=labels)["accuracy"]
+   f1 = load_f1.compute(predictions=predictions, references=labels)["f1"]
+   return {"accuracy": accuracy, "f1": f1}
 
-specific_model = pipeline(model="alexamiredjibi/results")
-specific_model(data)
+
+model = pipeline(model="alexamiredjibi/trajectory-classifier2")
+
+# test_set = [test_sentences[i] + '. ' + test_trajectories[i] for i in range(len(test_sentences))]
+# #model(test_dataset)
+# print(len(test_set))
+# predictions = [model(test_set[i]) for i in range(len(test_set))]
+# preds = []
+# for i in range(len(predictions)):
+#     if predictions[i][0]['label'] == 'LABEL_1':
+#         preds.append(1)
+#     else:
+#         preds.append(0)
+
+# val_set = [val_sentences[i] + '. ' + val_trajectories[i] for i in range(len(val_sentences))]
+# #model(test_dataset)
+# print(len(val_set))
+# predictions = [model(val_set[i]) for i in range(len(val_set))]
+# preds = []
+# for i in range(len(predictions)):
+#     if predictions[i][0]['label'] == 'LABEL_1':
+#         preds.append(1)
+#     else:
+#         preds.append(0)
+
+# with open('data/val_preds', 'wb') as f:
+#     pickle.dump(preds, f)
+
+# open the 'data/val_preds' file and load the predictions
+with open('data/val_preds', 'rb') as f:
+    preds = pickle.load(f)
+
+
+def eval(predictions, labels):
+    assert len(predictions) == len(labels)
+    correct = 0
+    for i in range(len(predictions)):
+        if predictions[i] == labels[i]:
+            correct += 1
+    return correct / len(predictions)
+
+print(eval(preds, val_labels))
+
+
+# evaluate the model on the test set
+
 
 
