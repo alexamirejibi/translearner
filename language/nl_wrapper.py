@@ -46,7 +46,7 @@ def shorten_trajectory(trajectory):
     return new_traj
 
 class BasicWrapper(gym.Wrapper):
-    def __init__(self, env, trajectory=[], instruction='go left', method='reverse', lang_coefficient=0.5):
+    def __init__(self, env, trajectory=[], instruction='go left', method='reverse', lang_coefficient=0.2):
         super().__init__(env)
         self.time = 0
         self.total_time = 0
@@ -90,13 +90,13 @@ class BasicWrapper(gym.Wrapper):
     def step(self, action):
         next_state, reward, done, info = self.env.step(action)
         # modify ...
-        self.trajectory.append(action[0])
+        self.trajectory.append(action)
         self.time += 1
-        if self.time == 4:
-            if len(self.trajectory) > max_traj_length + 3:
-                self.trajectory.pop(0)
-                self.trajectory = shorten_trajectory(self.trajectory)
-            print('time is 4')
+        if len(self.trajectory) > 15:
+            self.trajectory.pop(0)
+            # self.trajectory = shorten_trajectory(self.trajectory)
+        if self.time == 5:
+            #print('time is 5')
             reward = self.get_lang_reward(reward)
             self.time = 0
         return next_state, reward, done, info

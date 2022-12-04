@@ -1,7 +1,7 @@
 import pickle
 
 
-with open('data/sentence_action_pairs.pkl', 'rb') as f:
+with open('data/recency_sentence_action_pairs.pkl', 'rb') as f:
     data = pickle.load(f)
     # for i in data[0]:
     #     print(i + '\n')

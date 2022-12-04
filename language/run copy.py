@@ -1,8 +1,10 @@
 import pickle
+import sys
+sys.path.insert(0, 'data/')
 from transformers import DistilBertForSequenceClassification, Trainer, TrainingArguments, DistilBertTokenizerFast, DataCollatorWithPadding, pipeline
 import random
 from sklearn.model_selection import train_test_split
-from dataset import AnnotatedTrajectoryDataset
+from language.dataset import AnnotatedTrajectoryDataset
 import evaluate
 import numpy as np
 import torch

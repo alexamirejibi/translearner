@@ -2,6 +2,7 @@ import pickle
 from transformers import DistilBertForSequenceClassification, Trainer, TrainingArguments, DistilBertTokenizerFast, DataCollatorWithPadding
 import random
 from sklearn.model_selection import train_test_split
+import sys
 from dataset import AnnotatedTrajectoryDataset
 from datasets import load_metric
 import numpy as np
@@ -11,7 +12,7 @@ from huggingface_hub import notebook_login
 
 sentence_trajectory_pairs = []
 
-with open('data/sentence_action_pairs.pkl', 'rb') as f:
+with open('data/recency_sentence_action_pairs.pkl', 'rb') as f:
     data = pickle.load(f)
     for i in data:
         sentence_trajectory_pairs.append({'sentence': i['sentence'],
@@ -62,7 +63,7 @@ test_dataset = AnnotatedTrajectoryDataset(test_encodings, test_labels)
 # print(train_pairs[0])
 # print(train_pairs.get_batch_labels(0))
 
-model = DistilBertForSequenceClassification.from_pretrained("model_learn_pretrained")
+model = DistilBertForSequenceClassification.from_pretrained("distibert-base-uncased", num_labels=2)
 
 def compute_metrics(eval_pred):
    load_accuracy = load_metric("accuracy")
@@ -77,7 +78,7 @@ def compute_metrics(eval_pred):
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
 training_args = TrainingArguments(
-    output_dir='results',          # output directory
+    output_dir='traj-classifier-recency',          # output directory
     num_train_epochs=15,              # total number of training epochs
     per_device_train_batch_size=16,  # batch size per device during training
     per_device_eval_batch_size=64,   # batch size for evaluation
@@ -100,5 +101,5 @@ trainer = Trainer(
 )
 
 trainer.train()
-trainer.push_to_hub("alexamiredjibi/trajectory-classifier")
+trainer.push_to_hub("alexamiredjibi/traj-classifier-recency")
 trainer.evaluate(test_dataset)
