@@ -17,7 +17,7 @@ from transformers import pipeline
 
 
 class TaskWrapper(gym.Wrapper):
-    def __init__(self, env:gym.Env, save_data=False, save_path:str=""):
+    def __init__(self, env:gym.Env, save_data=True, save_path:str=""):
         super().__init__(env)
         # task_dict = {0: DownLadderJumpRight, 1: ClimbDownRightLadder, 2: JumpSkullReachLadder, 3: JumpSkullGetKey, 4: ClimbLadderGetKey, 5: ClimbDownGoRightClimbUp, 6: JumpMiddleClimbReachLeftDoor}
         # tsk = task_dict[task_id]
@@ -62,10 +62,12 @@ class TaskWrapper(gym.Wrapper):
         if self.task != None and self.task.finished():
             self.successes =+ 1
             reward = max(reward, 1)
-            print('task done')
-        if self.save_data_file:
+            #print('task done')
+        if (self.n_steps % 10000 == 0) and self.save_data:
             a = np.array([[self.n_steps, self.successes]])
             self.successes_array = np.concatenate((self.successes_array, a), axis=0)
+            print('---saved data---// n_steps: {} // successes: {} // success rate: {}'.format(self.n_steps, self.successes, self.successes/self.n_steps * 100))
+            self.save_data_file()
             # print('logged data')
         return next_state, reward, done, info
 

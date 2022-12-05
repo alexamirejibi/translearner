@@ -79,14 +79,14 @@ class BasicWrapper(gym.Wrapper):
         #     score = 1
         rew = reward + score
         rew = min(1, rew)
-        if rew > reward:
-            print("trajectory reward: ", rew - reward)
-            print('trajectory is: ' + str_traj)
-        else:
-          print('NO')
+        # if rew > reward:
+        #     #print("trajectory reward: ", rew - reward)
+        #     #print('trajectory is: ' + str_traj)
+        # else:
+        #   #print('NO')
         if rew > self.highest_lang_reward:
             self.highest_lang_reward = rew
-            print("highest lang reward: ", self.highest_lang_reward)
+            #print("highest lang reward: ", self.highest_lang_reward)
         return rew * self.lang_coefficient
 
     def step(self, action):
@@ -107,7 +107,7 @@ class BasicWrapper(gym.Wrapper):
     def reset(self):
         self.trajectory = []
         self.time = 0
-        print('reset trajectory')
+        #print('reset trajectory')
         return self.env.reset()
 
 class ObservationWrapper(gym.ObservationWrapper):
