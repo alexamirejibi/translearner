@@ -1,9 +1,7 @@
 from transformers import pipeline
 
-data = ["go down and to the left. DOWN, DOWN, LEFT, LEFT, DOWN, RIGHT, RIGHT"]
+data = ["go down and to the left. LEFT, LEFT, DOWN, DOWN"]
 
-specific_model = pipeline(model="alexamiredjibi/trajectory-classifier2")
+specific_model = pipeline(model="alexamiredjibi/traj-classifier-recency")
 
-logits, labels = specific_model(data)
-print(logits)
-print(labels)
+print(specific_model(data))

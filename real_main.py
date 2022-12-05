@@ -56,9 +56,9 @@ env = AtariWrapper(env)
 
 if args.lang_rewards:
     if args.instr == 'none':
-        env = nlw.BasicWrapper(env)
+        env = nlw.BasicWrapper(env, args=args)
     else:
-        env = nlw.BasicWrapper(env, instruction=args.instr)
+        env = nlw.BasicWrapper(env, args=args)
 
 env = TaskWrapper(env, save_data=True, save_path=log_save_path)
 task = task_dict[args.task](env)
