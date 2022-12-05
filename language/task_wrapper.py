@@ -63,10 +63,10 @@ class TaskWrapper(gym.Wrapper):
             self.successes =+ 1
             reward = max(reward, 1)
             #print('task done')
-        if (self.n_steps % 10000 == 0) and self.save_data:
+        if (self.n_steps % 10000 == 0 or self.n_steps == 10) and self.save_data:
             a = np.array([[self.n_steps, self.successes]])
             self.successes_array = np.concatenate((self.successes_array, a), axis=0)
-            print('---saved data---// n_steps: {} // successes: {} // success rate: {}'.format(self.n_steps, self.successes, self.successes/self.n_steps * 100))
+            print('-saved data-// n_steps: {} // successes: {} // success rate: {}'.format(self.n_steps, self.successes, self.successes/self.n_steps * 100))
             self.save_data_file()
             # print('logged data')
         return next_state, reward, done, info
