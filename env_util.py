@@ -158,9 +158,9 @@ def make_atari_env(
         # env = BasicWrapper(env, args=parser_args)
         env = TaskWrapper(env, save_data=True, save_path=save_path)
         task = task_dict[parser_args.task](env)
-        print('task instance created: ', task)
+        #print('task instance created: ', task)
         env.assign_task(task)
-        print('task assigned to env: ', env)
+        #print('task assigned to env: ', env)
         return env
 
     return make_vec_env(
