@@ -30,10 +30,10 @@ parser.add_argument('--task', type=int, default=1, help='task number 0-6'+str(ta
 parser.add_argument('--lang_rewards', type=str, default='true', help='use language rewards')
 parser.add_argument('--timesteps', type=int, default=500000, help='number of timesteps to play')
 parser.add_argument('--render', type=str, default='false', help='use language rewards')
-parser.add_argument('--instr', type=str, default='data/train_log', help='instruction type')
+parser.add_argument('--instr', type=str, default='none', help='instruction type')
 parser.add_argument('--lang_coef', type=float, default=0.2, help='language reward coefficient')
 # save path arg
-parser.add_argument('--save_folder', type=str, default='none', help='save path')
+parser.add_argument('--save_folder', type=str, default='data/train_log', help='save path')
 args = parser.parse_args()
 
 print("lang rewards: ", args.lang_rewards)
