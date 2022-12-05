@@ -74,7 +74,7 @@ class BasicWrapper(gym.Wrapper):
         else:
             score = 1 - clas[0]['score']
         print('score is: ' + str(score))
-        if score < 0.2:
+        if score < 0.1:
             score = 0
         elif score > 0.85:
             score = 1

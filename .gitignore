@@ -5,3 +5,5 @@ bert2bert/pytorch_model.bin
 model_learn_pretrained/config.json
 model_learn_pretrained/pytorch_model.bin
 model_learn_pretrained/training_args.bin
+models/PPO-model-task_2_.zip
+models/PPO-task-4-lang-False.zip

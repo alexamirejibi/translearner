@@ -4,6 +4,7 @@ import pickle
 class Task(object):
   def __init__(self, env, start):
     self.env = env
+    self.start = start
     with open('task_states/{}.pkl'.format(start), 'rb') as inp:
       newState = pickle.load(inp)
     env.restore_state(newState)
@@ -17,6 +18,14 @@ class Task(object):
     x, y = self.env.agent_pos()
     return (x_ - 5 <= x <= x_ + 5) and (y_ - 5 <= y <= y_ + 5)
 
+  def reset(self):
+    with open('task_states/{}.pkl'.format(self.start), 'rb') as inp:
+      newState = pickle.load(inp)
+    self.env.restore_state(newState)
+    obs, _, _, _ = self.env.step(0)
+    return obs
+    # self.start = self.env.load_state('game_state_ckpts/{}.npy'.format(start))
+    
 class DownLadderJumpRight(Task):
   def __init__(self, env):
     super().__init__(env, 'task_0')
@@ -40,6 +49,14 @@ class JumpSkullReachLadder(Task):
 
   def finished(self):
     return self.reached_pos(20, 148)
+
+class JumpSkullGetKey(Task):
+  def __init__(self, env):
+    super().__init__(env, 'task_2')
+    self.env.repeat_action(0, 4)
+
+  def finished(self):
+    return self.env.has_key()
 
 
 class ClimbLadderGetKey(Task):

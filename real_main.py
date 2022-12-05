@@ -20,51 +20,101 @@ from stable_baselines3.common.env_util import make_atari_env
 from stable_baselines3.common.vec_env import VecFrameStack
 from stable_baselines3.common.evaluation import evaluate_policy
 
-env = gym.make("ALE/MontezumaRevenge-v5")
-height, width, channels = env.observation_space.shape
-actions = env.action_space.n
+# parse arguments
+import argparse
+task_dict = {0: DownLadderJumpRight, 1: ClimbDownRightLadder, 2: JumpSkullReachLadder, 
+            3: JumpSkullGetKey, 4: ClimbLadderGetKey, 5: ClimbDownGoRightClimbUp, 6: JumpMiddleClimbReachLeftDoor}
+parser = argparse.ArgumentParser()
+parser.add_argument('--task', type=int, default=1, help='task number 0-6'+str(task_dict))
+parser.add_argument('--lang_rewards', action=argparse.BooleanOptionalAction)
+#parser.add_argument('--lang_rewards', type=bool, default=True, help='use language rewards')
+parser.add_argument('--timesteps', type=int, default=500000, help='number of timesteps to play')
+parser.add_argument('--render', action=argparse.BooleanOptionalAction)
+parser.add_argument('--instr', type=str, default='none', help='instruction type')
+parser.add_argument('--lang_coef', type=float, default=0.2, help='language reward coefficient')
+args = parser.parse_args()
 
-# env = AtariWrapper(env)
-#env = nlw.BasicWrapper(env)
-env.reset()
+print("lang rewards: ", args.lang_rewards)
+print("task: ", args.task)
+print("timesteps: ", args.timesteps)
+print("render: ", args.render)
+print("instr: ", args.instr)
+print("lang_coef: ", args.lang_coef)
 
-env = TaskWrapper(env)
-task = ClimbDownRightLadder(env)
+
+log_save_path = 'data/train_log/task-{}-lang-{}.npy'.format(args.task, args.lang_rewards)
+#env = gym.make("ALE/MontezumaRevenge-v5", render_mode='human')
+#height, width, channels = env.observation_space.shape
+#actions = env.action_space.n
+
+if args.render:
+    env = gym.make("ALE/MontezumaRevenge-v5", render_mode='human')
+else:
+    env = gym.make("ALE/MontezumaRevenge-v5")
+env = AtariWrapper(env)
+
+
+if args.lang_rewards:
+    if args.instr == 'none':
+        env = nlw.BasicWrapper(env)
+    else:
+        env = nlw.BasicWrapper(env, instruction=args.instr)
+
+env = TaskWrapper(env, save_data=True, save_path=log_save_path)
+task = task_dict[args.task](env)
+env.task = task
+_ = env.reset()
+#task = ClimbLadderGetKey(env)
 
 # play(env, zoom=5)
-# model = PPO("CnnPolicy", env, verbose=1, device="cpu")
-# model.learn(total_timesteps=25000)
-# model.save("models/PPO-model-" + 'task1')
+# 2048
+model = PPO("CnnPolicy", env, verbose=1, device="cpu")
+model.learn(total_timesteps=args.timesteps)
+model.save("models/PPO-task-{}-lang-{}".format(args.task, args.lang_rewards))
 
-episodes = 100
-time_steps = 0
-num_finished = 0
-for episode in range(1, episodes+1):
-    task = ClimbDownRightLadder(env)
-    start_lives = 6
-    env.step(0)
-    done = False
-    score = 0 
-    dead = False
-
-    while not (done or dead):
-        if env.lives < 6:
-            dead = True
-        env.render()
-        action = env.env.action_space.sample()
-        n_state, reward, done, info = env.step(action)
-        score+=reward
-        time_steps += 1
-        time.sleep(0.01)
-        num_finished = (num_finished + 1) if task.finished() else num_finished
-        done = task.finished() or done
-        if task.finished():
-            print("finished task")
-            time.sleep(2)
-    print('Episode:{} Score:{}'.format(episode, score))
-    # print(env.agent_pos())
-    # print(env.has_key())
-    # print(env.room())
-    print('Finished: {}/{}'.format(num_finished, episode))
-print(time_steps)
+print(env.n_steps)
+print(env.successes)
+print(env.successes_array)
+env.save_data_file()
 env.close()
+
+# episodes = 100
+# # time_steps = 0
+# max_time = 1000
+# log_interval = 1000
+# num_finished = 0
+# while True:
+#     if env.n_steps > max_time:
+#         break
+#     task.reset()
+#     start_lives = task.env.lives
+#     env.step(0)
+#     done = False
+#     score = 0 
+#     dead = False
+
+#     while not done:
+#         if env.lives < start_lives:
+#             done = True
+#         env.render()
+#         action = env.env.action_space.sample()
+#         n_state, reward, done, info = env.step(action)
+#         score+=reward
+#         time.sleep(0.01)
+#         num_finished = (num_finished + 1) if task.finished() else num_finished
+#         done = env.finished() or done
+#         if env.finished():
+#             print("finished task")
+#             time.sleep(2)
+#         if env.n_steps >= max_time:
+#             break
+#         #print(reward)
+#     # print('Episode:{} Score:{}'.format(episode, score))
+#     # print(env.agent_pos())
+#     # print(env.has_key())
+#     # print(env.room())
+#     # print('Finished: {}/{}'.format(num_finished, episode))
+# print(env.n_steps)
+# print(num_finished)
+# env.save_data_file()
+# env.close()

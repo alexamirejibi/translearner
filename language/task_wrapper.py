@@ -11,18 +11,29 @@ from itertools import groupby
 import pdb
 import pickle
 import torch
-sys.path.insert(0, 'data/')
+#sys.path.insert(0, 'data/')
 from tasks import *
 from transformers import pipeline
 
 
 class TaskWrapper(gym.Wrapper):
-    def __init__(self, env:gym.Env):
+    def __init__(self, env:gym.Env, save_data=False, save_path:str=""):
         super().__init__(env)
+        # task_dict = {0: DownLadderJumpRight, 1: ClimbDownRightLadder, 2: JumpSkullReachLadder, 3: JumpSkullGetKey, 4: ClimbLadderGetKey, 5: ClimbDownGoRightClimbUp, 6: JumpMiddleClimbReachLeftDoor}
+        # tsk = task_dict[task_id]
+        # self.task = tsk
+        self.task = None
         self.env = env
+        self.env.reset()
         self.n_steps = 0
-        self.time = 0
         self.env = env
+        self.successes = 0
+        self.log_interval = 1000
+        self.save_data = save_data
+        self.save_path = save_path
+        self.start_lives = None
+        # make empty 2d numpy array
+        self.successes_array = np.empty((0,2), int)
         # self.trajectory = []
         # self.model = pipeline(model="alexamiredjibi/trajectory-classifier2")
         # self.instruction = instruction
@@ -32,12 +43,51 @@ class TaskWrapper(gym.Wrapper):
         # 'DOWN-RIGHT', 'DOWN-LEFT', 'JUMP UP', 'JUMP RIGHT', 'JUMP LEFT', 'JUMP DOWN', 'JUMP UP-RIGHT',
         # 'JUMP UP-LEFT', 'JUMP DOWN-RIGHT', 'JUMP DOWN-LEFT']
     
-        
+    def get_task(self, task_id):
+        task_dict = {0: DownLadderJumpRight, 1: ClimbDownRightLadder, 2: JumpSkullReachLadder, 3: JumpSkullGetKey, 4: ClimbLadderGetKey, 5: ClimbDownGoRightClimbUp, 6: JumpMiddleClimbReachLeftDoor}
+        return task_dict[task_id](self)
+    
+    def assign_task(self, task):
+        self.task = task
+        self.task.reset()
+        self.start_lives = self.env.ale.lives()
+
     def step(self, action):
         next_state, reward, done, info = self.env.step(action)
-        # modify ...
+        if self.start_lives != None and self.env.ale.lives() < self.start_lives:
+            self.reset()
+        # modify ...q
         self.n_steps += 1
+        print(self.n_steps)
+        if self.task != None and self.task.finished():
+            self.successes =+ 1
+            reward = max(reward, 1)
+        if self.save_data_file:
+            a = np.array([[self.n_steps, self.successes]])
+            self.successes_array = np.concatenate((self.successes_array, a), axis=0)
+            print('logged data')
         return next_state, reward, done, info
+
+    def reset(self):
+        return self.task.reset()
+        
+    
+    def finished(self):
+        return self.task.finished()
+    
+    def add_task(self, task):
+        self.task = task(self)
+
+    def reached_pos(self, x_, y_):
+        x, y = self.agent_pos()
+        return (x_ - 5 <= x <= x_ + 5) and (y_ - 5 <= y <= y_ + 5)
+    
+    def get_data(self):
+        return self.successes_array
+
+    def save_data_file(self):
+        np.save(self.save_path, self.successes_array)
+        print('saved data')
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     def new_game(self, from_random_game=False):
@@ -80,7 +130,7 @@ class TaskWrapper(gym.Wrapper):
 
     def repeat_action(self, action, n=1):
         for _ in range(n):
-            self._step(action)
+            self.step(action)
 
     def inspect(self):
         screen = self.env.ale.getScreenRGB()
@@ -100,26 +150,6 @@ class TaskWrapper(gym.Wrapper):
             self.task = ClimbDownGoRightClimbUp(self)
         elif self.args.expt_id == 5:
             self.task = JumpMiddleClimbReachLeftDoor(self)
-        elif self.args.expt_id == 6:
-            self.task = Task6(self)
-        elif self.args.expt_id == 7:
-            self.task = Task7(self)
-        elif self.args.expt_id == 8:
-            self.task = Task8(self)
-        elif self.args.expt_id == 9:
-            self.task = Task9(self)
-        elif self.args.expt_id == 10:
-            self.task = Task10(self)
-        elif self.args.expt_id == 11:
-            self.task = Task11(self)
-        elif self.args.expt_id == 12:
-            self.task = Task12(self)
-        elif self.args.expt_id == 13:
-            self.task = Task13(self)
-        elif self.args.expt_id == 14:
-            self.task = Task14(self)
-        elif self.args.expt_id == 15:
-            self.task = Task15(self)
             
         self._step(0)
         self._step(0)
@@ -131,13 +161,13 @@ class TaskWrapper(gym.Wrapper):
         return self.screen, 0, 0, self.terminal
         
 
-    def _step(self, action):
-        self._screen, self.reward, self.terminal, _ = self.env.step(action)
-        self.n_steps += 1
+    # def _step(self, action):
+    #     self._screen, self.reward, self.terminal, _ = self.env.step(action)
+    #     self.n_steps += 1
 
-    def _random_step(self):
-        action = self.env.action_space.sample()
-        self._step(action)
+    # def _random_step(self):
+    #     action = self.env.action_space.sample()
+    #     self._step(action)
 
     # @ property
     # def screen(self):
