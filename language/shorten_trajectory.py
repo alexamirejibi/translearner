@@ -14,7 +14,7 @@ def shorten_trajectory2(trajectory):
 
 
 def shorten_trajectory(trajectory):
-    max_traj_length = 8
+    max_traj_length = 10
     # # remove 0's from the start of the trajectory
     # while len(trajectory) > 1 and trajectory[0] == 0:
     #     trajectory.pop(0)
@@ -55,7 +55,7 @@ def shorten_trajectory(trajectory):
 
 
 def shorten_traj_recency(trajectory):
-    max_traj_length = 20
+    max_traj_length = 10
     length = len(trajectory)
 
     # # remove 0's from the start of the trajectory
@@ -118,7 +118,7 @@ def shorten_traj_recency(trajectory):
     return new_traj
 
 def expand_trajectory(trajectory):
-    max_traj_length = 20
+    max_traj_length = 10
     length = len(trajectory)
 
     # # remove 0's from the start of the trajectory
@@ -202,7 +202,11 @@ def find_total_length(split_sequences):
 # data1 = [1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 5, 5, 10]
 #data = [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]
 
-# print(shorten_traj_recency(data))
+data = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9]
+print(data)
+print(shorten_traj_recency(data))
+print(shorten_trajectory2(data))
+print(shorten_trajectory(data))
 
-data = [1, 2, 3, 4, 5]
+data = [1, 2, 3]
 print(expand_trajectory(data))
