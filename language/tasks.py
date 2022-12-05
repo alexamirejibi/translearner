@@ -21,8 +21,11 @@ class Task(object):
   def reset(self):
     with open('task_states/{}.pkl'.format(self.start), 'rb') as inp:
       newState = pickle.load(inp)
-    self.env.restore_state(newState)
+    self.env.env.reset()
+    self.env.env.restore_state(newState)
     obs, _, _, _ = self.env.step(0)
+    #print('reset at {}'.format(self.env.n_steps))
+    print('task reset: ', self)
     return obs
     # self.start = self.env.load_state('game_state_ckpts/{}.npy'.format(start))
     

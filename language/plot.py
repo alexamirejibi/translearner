@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # load numpy array from npy file
-data = np.load('data/train_log/task-4-lang-False.npy')
+data = np.load('data/train_log/task-5-lang-true.npy')
 print(data)
 # add data to plot
 

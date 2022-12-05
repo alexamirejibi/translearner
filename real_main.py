@@ -1,20 +1,13 @@
 
 import gym 
 # from gym.utils.play import play
-import random
 import sys
 sys.path.insert(0, 'language/')
 import language.nl_wrapper as nlw
 # import atari wrappers
 from stable_baselines3.common.atari_wrappers import AtariWrapper
-from stable_baselines3.common.vec_env import VecFrameStack
 from language.task_wrapper import TaskWrapper
 from language.tasks import *
-from language.play import play
-import numpy as np
-from ale_py import ALEInterface
-import pickle
-import time 
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_atari_env
 from stable_baselines3.common.vec_env import VecFrameStack
@@ -32,8 +25,8 @@ parser.add_argument('--timesteps', type=int, default=500000, help='number of tim
 parser.add_argument('--render', type=str, default='false', help='use language rewards')
 parser.add_argument('--instr', type=str, default='none', help='instruction type')
 parser.add_argument('--lang_coef', type=float, default=0.2, help='language reward coefficient')
-# save path arg
 parser.add_argument('--save_folder', type=str, default='data/train_log', help='save path')
+parser.add_argument('--device', type=str, default='cuda', help='save path')
 args = parser.parse_args()
 
 print("lang rewards: ", args.lang_rewards)
@@ -71,8 +64,8 @@ _ = env.reset()
 
 # play(env, zoom=5)
 # 2048
-# env = VecFrameStack(env, n_stack=4)
-model = PPO("CnnPolicy", env, verbose=1, tensorboard_log="data/tensorboard/")
+#env = VecFrameStack(env, n_stack=4)
+model = PPO("CnnPolicy", env, verbose=1, tensorboard_log="data/tensorboard/", device=args.device)
 model.learn(total_timesteps=args.timesteps)
 model.save("models/PPO-task-{}-lang-{}".format(args.task, args.lang_rewards))
 

@@ -1,22 +1,17 @@
+
 import gym 
-from gym.utils.play import play
+# from gym.utils.play import play
 import random
 import sys
 sys.path.insert(0, 'language/')
 import language.nl_wrapper as nlw
 # import atari wrappers
 from stable_baselines3.common.atari_wrappers import AtariWrapper
-from stable_baselines3.common.vec_env import VecFrameStack
-from language.task_wrapper import TaskWrapper
 from language.tasks import *
-#from language.play import play
 import numpy as np
-from ale_py import ALEInterface
-import pickle
-import time 
 from stable_baselines3 import PPO
-from stable_baselines3.common.env_util import make_atari_env
-from stable_baselines3.common.vec_env import VecFrameStack
+#from stable_baselines3.common.env_util import make_atari_env
+from env_util import make_atari_env
 from stable_baselines3.common.evaluation import evaluate_policy
 
 # parse arguments
@@ -34,6 +29,8 @@ parser.add_argument('--lang_coef', type=float, default=0.2, help='language rewar
 # save path arg
 parser.add_argument('--save_folder', type=str, default='data/train_log', help='save path')
 parser.add_argument('--device', type=str, default='cuda', help='save path')
+parser.add_argument('--seq_model', type=str, default='alexamiredjibi/traj-classifier-recency', help='sequence classification model')
+# arg for loading model
 args = parser.parse_args()
 
 print("lang rewards: ", args.lang_rewards)
@@ -50,40 +47,43 @@ log_save_path = '{}/task-{}-lang-{}.npy'.format(args.save_folder, args.task, arg
 #height, width, channels = env.observation_space.shape
 #actions = env.action_space.n
 
-if args.render == 'true':
-    env = gym.make("ALE/MontezumaRevenge-v5", render_mode='human')
-else:
-    env = gym.make("ALE/MontezumaRevenge-v5")
-#env = AtariWrapper(env)
+# if args.render == 'true':
+#     env = gym.make("ALE/MontezumaRevenge-v5", render_mode='human')
+# else:
+#     env = gym.make("ALE/MontezumaRevenge-v5")
+# env = gym.make("ALE/MontezumaRevenge-v5")
+# env = AtariWrapper(env)
+
+env_name = "MontezumaRevengeNoFrameskip-v4"
+# env = gym.make(env_name)
+env = make_atari_env(env_name, n_envs=16, seed=0, parser_args=args, save_path=log_save_path)
 
 
-if args.lang_rewards == 'true':
-    if args.instr == 'none':
-        env = nlw.BasicWrapper(env, args=args)
-    else:
-        env = nlw.BasicWrapper(env, args=args)
 
-env = TaskWrapper(env, save_data=True, save_path=log_save_path)
-task = task_dict[args.task](env)
-env.assign_task(task)
-env.reset()
+# if args.lang_rewards == 'true':
+#     if args.instr == 'none':
+#         env = nlw.BasicWrapper(env, args=args)
+#     else:
+#env = nlw.BasicWrapper(env, args=args)
+
+# env = TaskWrapper(env, save_data=True, save_path=log_save_path)
+# task = task_dict[args.task](env)
+# env.task = task
+# _ = env.reset()
 #task = ClimbLadderGetKey(env)
 
 # play(env, zoom=5)
 # 2048
-# env = VecFrameStack(env, n_stack=4)
-# model = PPO("CnnPolicy", env, verbose=1, tensorboard_log="data/tensorboard/", device=args.device)
-# model.learn(total_timesteps=args.timesteps)
-# model.save("models/PPO-task-{}-lang-{}".format(args.task, args.lang_rewards))
-
-print('key: ', env.has_key())
-play(env, zoom=5)
-print('key: ', env.has_key())
+#env = VecFrameStack(env, n_stack=4)
+# tensorboard
+model = PPO("CnnPolicy", env, verbose=1, tensorboard_log="data/tensorboard/", device=args.device)
+model.learn(total_timesteps=args.timesteps)
+model.save("models/PPO-task-{}-lang-{}".format(args.task, args.lang_rewards))
+evaluate_policy(model, env)
 
 # print(env.n_steps)
 # print(env.successes)
 # print(env.successes_array)
-#env.save_data_file()
 # env.close()
 
 # episodes = 100
@@ -125,30 +125,4 @@ print('key: ', env.has_key())
 # print(env.n_steps)
 # print(num_finished)
 # env.save_data_file()
-# env.close()
-
-
-# for episode in range(1, episodes+1):
-#     state = env.restore_state(newState) 
-#     start_lives = 6
-#     env.step(0)
-#     done = False
-#     score = 0 
-#     dead = False
-
-#     while not (done or dead):
-#         if env.lives < 6:
-#             dead = True
-#         print(env.lives)
-#         env.render()
-#         action = env.env.action_space.sample()
-#         n_state, reward, done, info = env.step(action)
-#         score+=reward
-#         time_steps += 1
-#         #time.sleep(0.01)
-#     print('Episode:{} Score:{}'.format(episode, score))
-#     print(env.agent_pos())
-#     print(env.has_key())
-#     print(env.room())
-# print(time_steps)
 # env.close()

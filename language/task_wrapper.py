@@ -54,25 +54,34 @@ class TaskWrapper(gym.Wrapper):
 
     def step(self, action):
         next_state, reward, done, info = self.env.step(action)
+        #print('step')
         if self.start_lives != None and self.env.ale.lives() < self.start_lives:
+            # print('lost a life, current lives: ', self.env.ale.lives())
+            # print('start lives: ', self.start_lives)
             next_state = self.reset()
         # modify ...q
         self.n_steps += 1
         #print(self.n_steps)
         if self.task != None and self.task.finished():
-            self.successes =+ 1
+            # print('task done')
+            # print('successes ', self.successes)
+            self.successes = self.successes + 1
             reward = max(reward, 1)
-            #print('task done')
-        if (self.n_steps % 10000 == 0 or self.n_steps == 10) and self.save_data:
+            next_state = self.reset()
+            # a = np.array([[self.n_steps, self.successes]])
+            # self.successes_array = np.concatenate((self.successes_array, a), axis=0)
+            # self.save_data_file()
+            # print('saved data cuz task fin')
+        # if (self.n_steps % 100 == 0):
+        #     print('pos ', self.agent_pos())
+        if (self.n_steps % 1024 == 0 or self.n_steps == 10) and self.save_data:
             a = np.array([[self.n_steps, self.successes]])
             self.successes_array = np.concatenate((self.successes_array, a), axis=0)
-            print('-saved data-// n_steps: {} // successes: {} // success rate: {}'.format(self.n_steps, self.successes, self.successes/self.n_steps * 100))
+            print('n_steps: {} // successes: {} // success rate: {}'.format(self.n_steps, self.successes, (self.successes/self.n_steps) * 100))
             self.save_data_file()
-            # print('logged data')
         return next_state, reward, done, info
 
     def reset(self):
-        self.env.reset()
         return self.task.reset()
         
     
@@ -91,7 +100,7 @@ class TaskWrapper(gym.Wrapper):
 
     def save_data_file(self):
         np.save(self.save_path, self.successes_array)
-        print('saved data')
+        print('-=-=saved data=-=-')
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     def new_game(self, from_random_game=False):

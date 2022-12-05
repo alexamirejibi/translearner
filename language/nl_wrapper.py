@@ -46,7 +46,7 @@ max_traj_length = 25
 #     return new_traj
 
 class BasicWrapper(gym.Wrapper):
-    def __init__(self, env, args, trajectory=[], instruction='go left', method='reverse', lang_coefficient=0.2):
+    def __init__(self, env, args, trajectory=[], instruction='go left and jump', method='reverse', lang_coefficient=0.2):
         super().__init__(env)
         print('-=-=-=Initializing language environment=-=-=-')
         self.time = 0

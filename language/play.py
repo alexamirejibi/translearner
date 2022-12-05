@@ -79,7 +79,7 @@ def play(env, transpose=True, fps=30, zoom=None, callback=None, keys_to_action=N
             }
         If None, default key_to_action mapping for that env is used, if provided.
     """
-    #env.reset()
+    env.reset()
     rendered = env.render(mode="rgb_array")
 
     if keys_to_action is None:
@@ -142,6 +142,7 @@ def play(env, transpose=True, fps=30, zoom=None, callback=None, keys_to_action=N
         clock.tick(fps)
     #env.save_state("test_state_1")
     pygame.quit()
+    print('quit')
 
 
 
