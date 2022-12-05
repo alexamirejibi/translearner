@@ -72,7 +72,7 @@ _ = env.reset()
 # play(env, zoom=5)
 # 2048
 # env = VecFrameStack(env, n_stack=4)
-model = PPO("CnnPolicy", env, verbose=1, device="cpu")
+model = PPO("CnnPolicy", env, verbose=1, tensorboard_log="data/tensorboard/")
 model.learn(total_timesteps=args.timesteps)
 model.save("models/PPO-task-{}-lang-{}".format(args.task, args.lang_rewards))
 
