@@ -1,7 +1,7 @@
 import gym
 import numpy as np
 import sys
-from shorten_trajectory import shorten_traj_recency
+from shorten_trajectory import shorten_traj_recency, expand_trajectory
 from transformers import pipeline
 
 max_traj_length = 25
@@ -67,7 +67,6 @@ class BasicWrapper(gym.Wrapper):
             return reward
         str_traj_array = [self.action_words[x] for x in self.trajectory if (self.trajectory.count(x) / len(self.trajectory)) > 0.1]
         str_traj = ', '.join(str_traj_array)
-        #print('trajectory is: ' + str_traj)
         clas = self.model(self.instruction + '. ' + str_traj)
         if clas[0]['label'] == 'LABEL_1':
             score = clas[0]['score']
@@ -76,12 +75,15 @@ class BasicWrapper(gym.Wrapper):
         #print('score is: ' + str(score))
         if score < 0.1:
             score = 0
-        elif score > 0.85:
-            score = 1
+        # elif score > 0.85:
+        #     score = 1
         rew = reward + score
         rew = min(1, rew)
         if rew > reward:
             print("trajectory reward: ", rew - reward)
+            print('trajectory is: ' + str_traj)
+        else:
+          print('NO')
         if rew > self.highest_lang_reward:
             self.highest_lang_reward = rew
             print("highest lang reward: ", self.highest_lang_reward)
@@ -92,16 +94,21 @@ class BasicWrapper(gym.Wrapper):
         # modify ...
         self.trajectory.append(action)
         self.time += 1
-        if len(self.trajectory) > 25:
-            self.trajectory.pop(0)
-            # self.trajectory = shorten_trajectory(self.trajectory)
         if self.time == 5:
             #print('time is 5')
+            self.trajectory = [i for i in self.trajectory if i != 0]
+            if len(self.trajectory) > 0:
+               self.trajectory = shorten_traj_recency(self.trajectory) if len(self.trajectory) > max_traj_length else expand_trajectory(self.trajectory)
             reward = self.get_lang_reward(reward)
             self.time = 0
+        
         return next_state, reward, done, info
 
-
+    def reset(self):
+        self.trajectory = []
+        self.time = 0
+        print('reset trajectory')
+        return self.env.reset()
 
 class ObservationWrapper(gym.ObservationWrapper):
     def __init__(self, env):

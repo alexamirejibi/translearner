@@ -26,10 +26,10 @@ task_dict = {0: DownLadderJumpRight, 1: ClimbDownRightLadder, 2: JumpSkullReachL
             3: JumpSkullGetKey, 4: ClimbLadderGetKey, 5: ClimbDownGoRightClimbUp, 6: JumpMiddleClimbReachLeftDoor}
 parser = argparse.ArgumentParser()
 parser.add_argument('--task', type=int, default=1, help='task number 0-6'+str(task_dict))
-parser.add_argument('--lang_rewards', action=argparse.BooleanOptionalAction)
-#parser.add_argument('--lang_rewards', type=bool, default=True, help='use language rewards')
+#parser.add_argument('--lang_rewards', action=argparse.BooleanOptionalAction)
+parser.add_argument('--lang_rewards', type=str, default='true', help='use language rewards')
 parser.add_argument('--timesteps', type=int, default=500000, help='number of timesteps to play')
-parser.add_argument('--render', action=argparse.BooleanOptionalAction)
+parser.add_argument('--render', type=str, default='false', help='use language rewards')
 parser.add_argument('--instr', type=str, default='none', help='instruction type')
 parser.add_argument('--lang_coef', type=float, default=0.2, help='language reward coefficient')
 args = parser.parse_args()
@@ -47,14 +47,14 @@ log_save_path = 'data/train_log/task-{}-lang-{}.npy'.format(args.task, args.lang
 #height, width, channels = env.observation_space.shape
 #actions = env.action_space.n
 
-if args.render:
+if args.render == 'true':
     env = gym.make("ALE/MontezumaRevenge-v5", render_mode='human')
 else:
     env = gym.make("ALE/MontezumaRevenge-v5")
 env = AtariWrapper(env)
 
 
-if args.lang_rewards:
+if args.lang_rewards == 'true':
     if args.instr == 'none':
         env = nlw.BasicWrapper(env, args=args)
     else:

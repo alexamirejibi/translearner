@@ -55,20 +55,22 @@ class TaskWrapper(gym.Wrapper):
     def step(self, action):
         next_state, reward, done, info = self.env.step(action)
         if self.start_lives != None and self.env.ale.lives() < self.start_lives:
-            self.reset()
+            next_state = self.reset()
         # modify ...q
         self.n_steps += 1
-        print(self.n_steps)
+        #print(self.n_steps)
         if self.task != None and self.task.finished():
             self.successes =+ 1
             reward = max(reward, 1)
+            print('task done')
         if self.save_data_file:
             a = np.array([[self.n_steps, self.successes]])
             self.successes_array = np.concatenate((self.successes_array, a), axis=0)
-            print('logged data')
+            # print('logged data')
         return next_state, reward, done, info
 
     def reset(self):
+        self.env.reset()
         return self.task.reset()
         
     
