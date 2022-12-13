@@ -1,5 +1,5 @@
 import pickle
-from transformers import DistilBertForSequenceClassification, Trainer, TrainingArguments, DistilBertTokenizerFast, DataCollatorWithPadding
+from transformers import DistilBertForSequenceClassification, DistilBertConfig, Trainer, TrainingArguments, DistilBertTokenizerFast, DataCollatorWithPadding
 import random
 from sklearn.model_selection import train_test_split
 import sys
@@ -63,7 +63,10 @@ test_dataset = AnnotatedTrajectoryDataset(test_encodings, test_labels)
 # print(train_pairs[0])
 # print(train_pairs.get_batch_labels(0))
 
-model = DistilBertForSequenceClassification.from_pretrained("distibert-base-uncased", num_labels=2)
+
+config = DistilBertConfig(num_labels=2, seq_classif_dropout=0.6)
+
+model = DistilBertForSequenceClassification.from_pretrained("distibert-base-uncased", dropout=0.5, attention_dropout=0.5)
 
 def compute_metrics(eval_pred):
    load_accuracy = load_metric("accuracy")
