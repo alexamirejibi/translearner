@@ -1,20 +1,29 @@
 
-def shorten_trajectory2(trajectory):
+
+
+
+def shorten_trajectory_fully(trajectory):
     new_trajectory = []
-    # remove 0's from the start of the trajectory
+    # #remove 0's from the start of the trajectory
     # while len(trajectory) > 1 and trajectory[0] == 0:
     #     trajectory.pop(0)
     # # remove 0's from the end of the trajectory
     # while len(trajectory) > 1 and trajectory[-1] == 0:
     #     trajectory.pop()
+    trajectory = [x for x in trajectory if x != 0]
     for i in range(len(trajectory)):
         if i == 0 or trajectory[i] != new_trajectory[-1]:
             new_trajectory.append(trajectory[i])
     return new_trajectory
 
+def make_action_frequency_vector(trajectory):
+    frequencies = []
+    for i in range(18):
+        frequencies.append(trajectory.count(i))
+    return frequencies
 
 def shorten_trajectory(trajectory):
-    max_traj_length = 10
+    max_traj_length = 5
     # # remove 0's from the start of the trajectory
     # while len(trajectory) > 1 and trajectory[0] == 0:
     #     trajectory.pop(0)
@@ -202,11 +211,12 @@ def find_total_length(split_sequences):
 # data1 = [1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 5, 5, 10]
 #data = [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]
 
-data = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9]
-print(data)
-print(shorten_traj_recency(data))
-print(shorten_trajectory2(data))
-print(shorten_trajectory(data))
+data = [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9]
+# print(data)
+# print(shorten_traj_recency(data))
+print(shorten_trajectory_fully(data))
+print(make_action_frequency_vector(data))
+# print(shorten_trajectory(data))
 
-data = [1, 2, 3]
-print(expand_trajectory(data))
+# data = [1, 2, 3]
+# print(expand_trajectory(data))
