@@ -17,9 +17,7 @@ def shorten_trajectory_fully(trajectory):
     return new_trajectory
 
 def make_action_frequency_vector(trajectory):
-    frequencies = []
-    for i in range(18):
-        frequencies.append(trajectory.count(i))
+    frequencies = [round(trajectory.count(x) / len(trajectory), ndigits=2) for x in range(18)]
     return frequencies
 
 def shorten_trajectory(trajectory):
@@ -211,12 +209,7 @@ def find_total_length(split_sequences):
 # data1 = [1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 5, 5, 10]
 #data = [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]
 
-data = [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9]
 # print(data)
-# print(shorten_traj_recency(data))
-print(shorten_trajectory_fully(data))
-print(make_action_frequency_vector(data))
-# print(shorten_trajectory(data))
-
-# data = [1, 2, 3]
-# print(expand_trajectory(data))
+# data = [1, 2, 3, 4, 4, 4, 4, 4]
+# print(shorten_trajectory_fully(data))
+# print(make_action_frequency_vector(data))
