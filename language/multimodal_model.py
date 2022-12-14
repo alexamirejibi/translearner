@@ -19,18 +19,9 @@ from multimodal_transformers.data import load_data_from_folder
 from multimodal_transformers.model import TabularConfig
 from multimodal_transformers.model import AutoModelWithTabular
 
-logging.basicConfig(level=logging.INFO)
-os.environ['COMET_MODE'] = 'DISABLED'
-
-data_df = pd.read_csv('data/augmented_data.csv')
-print(data_df.describe(include=np.object))
-
-train_df, val_df, test_df = np.split(data_df.sample(frac=1), [int(.8*len(data_df)), int(.9 * len(data_df))])
-print('Num examples train-val-test')
-print(len(train_df), len(val_df), len(test_df))
-train_df.to_csv('data/new_split/train.csv')
-val_df.to_csv('data/new_split/val.csv')
-test_df.to_csv('data/new_split/test.csv')
+train_df = pd.read_csv('data/new_split/train.csv')
+val_df = pd.read_csv('data/new_split/val.csv')
+test_df = pd.read_csv('data/new_split/test.csv')
 
 @dataclass
 class ModelArguments:
@@ -132,16 +123,17 @@ class MultimodalDataTrainingArguments:
           with open(self.column_info_path, 'r') as f:
               self.column_info = json.load(f)
 
-text_cols = ['description']
-cat_cols = ['Clothing ID', 'Division Name', 'Department Name', 'Class Name']
-numerical_cols = ['Rating', 'Age', 'Positive Feedback Count']
+text_cols = ['description', 'short_traj']
+cat_cols = []
+numerical_cols = [i for i in range(18)]
+print(numerical_cols)
 
 column_info_dict = {
     'text_cols': text_cols,
     'num_cols': numerical_cols,
-    'cat_cols': cat_cols,
-    'label_col': 'Recommended IND',
-    'label_list': ['Not Recommended', 'Recommended']
+    #'cat_cols': cat_cols,
+    'label_col': 'label',
+    'label_list': ['0', '1', '2', '3', '4']
 }
 
 

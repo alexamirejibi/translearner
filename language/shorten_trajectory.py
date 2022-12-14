@@ -1,6 +1,6 @@
 
 
-
+from utils import short_traj_len
 
 def shorten_trajectory_fully(trajectory):
     new_trajectory = []
@@ -21,7 +21,7 @@ def make_action_frequency_vector(trajectory):
     return frequencies
 
 def shorten_trajectory(trajectory):
-    max_traj_length = 5
+    max_traj_length = short_traj_len
     # # remove 0's from the start of the trajectory
     # while len(trajectory) > 1 and trajectory[0] == 0:
     #     trajectory.pop(0)
@@ -31,7 +31,7 @@ def shorten_trajectory(trajectory):
     
     # remove all 0s
     trajectory = [i for i in trajectory if i != 0]
-    if len(trajectory) <= max_traj_length:
+    if len(trajectory) <= max_traj_length + 3:
         return trajectory.copy()
     
     traj_len = len(trajectory)
@@ -57,6 +57,13 @@ def shorten_trajectory(trajectory):
         if new_count == 0:
             new_count = 1
         new_traj.extend(l[:new_count])
+    
+    if len(new_traj) > max_traj_length + 4:
+        new_traj = []
+        for l in split_sequences:
+            new_count = len(l) * shrink_factor
+            if new_count > 0.2:
+                new_traj.extend(l[:1])
 
     return new_traj
 
