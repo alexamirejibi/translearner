@@ -32,7 +32,7 @@ def shorten_trajectory(trajectory):
     # remove all 0s
     trajectory = [i for i in trajectory if i != 0]
     if len(trajectory) <= max_traj_length:
-        return trajectory
+        return trajectory.copy()
     
     traj_len = len(trajectory)
     shrink_factor = max_traj_length / traj_len

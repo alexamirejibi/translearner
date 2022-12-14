@@ -1,0 +1,8 @@
+torch
+transformers>=4.5.1
+numpy
+tqdm
+scipy
+networkx
+scikit-learn
+pandas
