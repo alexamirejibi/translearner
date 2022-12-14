@@ -153,8 +153,8 @@ data_args = MultimodalDataTrainingArguments(
 )
 
 training_args = TrainingArguments(
-    output_dir="./logs/model_name",
-    logging_dir="./logs/runs",
+    output_dir="Multimodal-Trajectory-Classifier",
+    #logging_dir="Multimodal-Trajectory-Classifier/logs/runs",
     overwrite_output_dir=True,
     do_train=True,
     do_eval=True,
@@ -163,7 +163,8 @@ training_args = TrainingArguments(
     # evaluate_during_training=True,
     logging_steps=25,
     eval_steps=250,
-    use_mps_device=True
+    use_mps_device=True, # TODO check if this is needed  <<<<<<--------------------------<<<<<<
+    push_to_hub=True,
 )
 
 set_seed(training_args.seed)
