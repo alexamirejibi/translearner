@@ -86,8 +86,8 @@ random_traj_noise_30 = [] # 1/3 noise + incorrect sent
 random_traj_noise_50 = [] # 1/2 noise + incorrect sent
 random_traj_noise_75 = [] # 3/4 noise + incorrect sent
 for i in full_data:
-    make_datapoint(
-        add_noise(i['full_traj'], 0.3),
+    make_datapoint(     
+            add_noise(i['full_traj'], 0.3),
         i, 3, noise_30, transcribe_acts=True)
     make_datapoint(
         add_noise(i['full_traj'], 0.5),
