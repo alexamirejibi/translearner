@@ -65,7 +65,7 @@ training_args = TrainingArguments(
     # evaluate_during_training=True,
     logging_steps=25,
     eval_steps=250,
-    use_mps_device=True, # TODO check if this is needed  <<<<<<--------------------------<<<<<<
+    #use_mps_device=True, # TODO check if this is needed  <<<<<<--------------------------<<<<<<
     push_to_hub=True,
 )
 
