@@ -55,7 +55,7 @@ data_args = MultimodalDataTrainingArguments(
 )
 
 training_args = TrainingArguments(
-    output_dir="Multimodal-Trajectory-Classifier",
+    output_dir="Multimodal-Trajectory-Classifier-30",
     #logging_dir="Multimodal-Trajectory-Classifier/logs/runs",
     overwrite_output_dir=True,
     do_train=True,
@@ -93,7 +93,7 @@ train_dataset, val_dataset, test_dataset = load_data_from_folder(
 num_labels = len(np.unique(train_dataset.labels))
 print(num_labels)
 
-config = AutoConfig.from_pretrained('distilbert-base-uncased')
+config = AutoConfig.from_pretrained('alexamiredjibi/Multimodal-Trajectory-Classifier')
 tabular_config = TabularConfig(num_labels=num_labels,
                                # cat_feat_dim=train_dataset.cat_feats.shape[1],
                                numerical_feat_dim=train_dataset.numerical_feats.shape[1],
@@ -101,7 +101,7 @@ tabular_config = TabularConfig(num_labels=num_labels,
 config.tabular_config = tabular_config
 
 model = AutoModelWithTabular.from_pretrained(
-        'distilbert-base-uncased',
+        'alexamiredjibi/Multimodal-Trajectory-Classifier',
         config=config,
         cache_dir=model_args.cache_dir
     )
