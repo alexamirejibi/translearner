@@ -6,11 +6,7 @@ import numpy as np
 from utils import *
 from PIL import Image
 from copy import deepcopy
-import tensorflow as tf
 from itertools import groupby
-import pdb
-import pickle
-import torch
 #sys.path.insert(0, 'data/')
 from tasks import *
 from transformers import pipeline

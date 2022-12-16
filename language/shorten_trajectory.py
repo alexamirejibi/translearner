@@ -59,11 +59,12 @@ def shorten_trajectory(trajectory):
         new_traj.extend(l[:new_count])
     
     if len(new_traj) > max_traj_length + 4:
-        new_traj = []
-        for l in split_sequences:
-            new_count = len(l) * shrink_factor
-            if new_count > 0.2:
-                new_traj.extend(l[:1])
+        print('here')
+        new_traj = shorten_traj_recency(trajectory)
+        # for l in split_sequences:
+        #     new_count = len(l) * shrink_factor
+        #     if new_count > 0.2:
+        #         new_traj.extend(l[:1])
 
     return new_traj
 
@@ -99,6 +100,7 @@ def shorten_traj_recency(trajectory):
             split_sequences.append(tmp)
             tmp = [trajectory[i]]
     split_sequences.append(tmp)
+    print(split_sequences)
 
     significance_coefficients = [] # the more recent the action, the more significant it is
     
@@ -111,7 +113,7 @@ def shorten_traj_recency(trajectory):
     #print(len(new_split_sequences), len(significance_coefficients))
     while find_total_length(new_split_sequences) > max_traj_length:
         length = find_total_length(new_split_sequences)
-        #print('yes')
+        print(length)
         for i in range(len(new_split_sequences)):
             new_count = round(len(new_split_sequences[i]) * significance_coefficients[i])
             # if new_count == 0:
@@ -132,9 +134,7 @@ def shorten_traj_recency(trajectory):
     return new_traj
 
 def expand_trajectory(trajectory):
-    max_traj_length = 10
-    length = len(trajectory)
-
+    max_traj_length = short_traj_len
     # # remove 0's from the start of the trajectory
     # while len(trajectory) > 1 and trajectory[0] == 0:
     #     trajectory.pop(0)
@@ -146,8 +146,6 @@ def expand_trajectory(trajectory):
     # trajectory = [i for i in trajectory if i != 0]
     # if len(trajectory) <= max_traj_length:
     #     return trajectory
-
-    traj_len = len(trajectory)
 
     split_sequences = []
     tmp = []
@@ -215,8 +213,9 @@ def find_total_length(split_sequences):
 
 # data1 = [1, 1, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 4, 4, 4, 4, 4, 5, 5, 10]
 #data = [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]
-
+data = [5, 10, 3, 6, 12, 17, 14, 4, 9, 13, 10, 8, 11, 2, 7, 10, 9, 13, 16, 10, 9, 11, 13, 3, 15, 5, 1, 16, 6, 10, 11, 8]
 # print(data)
 # data = [1, 2, 3, 4, 4, 4, 4, 4]
+print(shorten_trajectory(data))
 # print(shorten_trajectory_fully(data))
 # print(make_action_frequency_vector(data))
