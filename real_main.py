@@ -52,9 +52,9 @@ env = AtariWrapper(env)
 
 if args.lang_rewards == 'true':
     if args.instr == 'none':
-        env = nlw.BasicWrapper(env, args=args)
+        env = nlw.Translearner(env, args=args)
     else:
-        env = nlw.BasicWrapper(env, args=args)
+        env = nlw.Translearner(env, args=args)
 
 env = TaskWrapper(env, save_data=True, save_path=log_save_path)
 task = task_dict[args.task](env)
@@ -77,12 +77,10 @@ _ = env.reset()
 
 episodes = 100
 # time_steps = 0
-max_time = 1000
+# max_time = 1000
 log_interval = 1000
 num_finished = 0
 while True:
-    if env.n_steps > max_time:
-        break
     task.reset()
     start_lives = task.env.lives
     env.step(0)
@@ -100,8 +98,6 @@ while True:
         done = env.finished() or done
         if env.finished():
             print("finished task")
-        if env.n_steps >= max_time:
-            break
         #print(reward)
     # print('Episode:{} Score:{}'.format(episode, score))
     # print(env.agent_pos())

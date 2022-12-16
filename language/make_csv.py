@@ -2,7 +2,7 @@ import csv
 import pickle
 from utils import action_words
 
-with open('data/augmented_data_5_labels.pkl', 'rb') as d:
+with open('data/new_augmented_data_5_labels.pkl', 'rb') as d:
     data = pickle.load(d)
 
 # open the file in the write mode
@@ -13,7 +13,7 @@ header = ['description', 'label', 'short_traj'] + action_words
 
 data_d = []
 
-with open('data/augmented_data.csv', 'w', newline='') as f:
+with open('data/new_augmented_data.csv', 'w', newline='') as f:
     # create the csv writer
     writer = csv.writer(f)
     writer.writerow(header)

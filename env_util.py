@@ -7,7 +7,7 @@ import gym
 from atari_wrappers import AtariWrapper
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecEnv
-from language.nl_wrapper import BasicWrapper
+from language.nl_wrapper import Translearner
 from language.task_wrapper import TaskWrapper
 from language.tasks import *
 
@@ -154,7 +154,7 @@ def make_atari_env(
     def atari_wrapper(env: gym.Env) -> gym.Env:
         env = AtariWrapper(env, **wrapper_kwargs)
         if parser_args.lang_rewards == 'true':
-            env = BasicWrapper(env, args=parser_args)
+            env = Translearner(env, args=parser_args)
         # env = BasicWrapper(env, args=parser_args)
         env = TaskWrapper(env, save_data=True, save_path=save_path)
         task = task_dict[parser_args.task](env)

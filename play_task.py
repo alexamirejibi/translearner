@@ -59,9 +59,9 @@ else:
 
 if args.lang_rewards == 'true':
     if args.instr == 'none':
-        env = nlw.BasicWrapper(env, args=args)
+        env = nlw.Translearner(env, args=args)
     else:
-        env = nlw.BasicWrapper(env, args=args)
+        env = nlw.Translearner(env, args=args)
 
 env = TaskWrapper(env, save_data=True, save_path=log_save_path)
 task = task_dict[args.task](env)

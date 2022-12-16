@@ -9,7 +9,7 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO)
 os.environ['COMET_MODE'] = 'DISABLED'
 
-data_df = pd.read_csv('data/augmented_data.csv')
+data_df = pd.read_csv('data/new_augmented_data.csv')
 
 print(data_df.describe(include=np.object))
 

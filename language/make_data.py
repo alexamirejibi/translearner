@@ -3,7 +3,7 @@ import pickle
 import random
 import sys
 sys.path.insert(0, 'language/')
-from shorten_trajectory import *
+from keep_common_actions import *
 
 
 training_data = 'data/train_lang_data.pkl'
@@ -19,7 +19,7 @@ with open(training_data, 'rb') as f:
         clip_id = dict['clip_id']
         sentence = dict['sentence']
         trajectory = clip_to_actions[clip_id]
-        trajectory = shorten_trajectory(trajectory)
+        trajectory = keep_common_actions(trajectory)
         # trajectory = [action_words[x] for x in trajectory if (trajectory.count(x) / len(trajectory)) > 0.1 and x != 0]
         #trajectory = [action_words[x] for x in trajectory]
         # combine all actions into one string

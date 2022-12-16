@@ -1,7 +1,7 @@
 import gym
 import numpy as np
 import sys
-from shorten_trajectory import shorten_trajectory
+from shorten_trajectory import resize
 from transformers import DistilBertTokenizerFast, AutoConfig, Trainer
 from multimodal_transformers.model import DistilBertWithTabular, TabularConfig
 from scipy.special import softmax
@@ -9,10 +9,10 @@ from scipy.special import softmax
 from utils import *
 
 
-class BasicWrapper(gym.Wrapper):
+class Translearner(gym.Wrapper):
     def __init__(self, env, args, trajectory=np.array([], dtype=int), instruction='go left and jump'):
         super().__init__(env)
-        print('-=-=-=Initializing language environment=-=-=-')
+        print('-=-=-=Initializing TransLEARNer=-=-=-')
         self.time = 0
         self.total_time = 0
         self.env = env
@@ -63,7 +63,7 @@ class BasicWrapper(gym.Wrapper):
             self.time = 0
         if action != 0:
             self.trajectory = np.append(self.trajectory, action)
-        if self.time == 40 and len(self.trajectory) > 0:
+        if self.time == 60 and len(self.trajectory) > 0:
             reward = self.get_lang_reward(reward)
             self.time = 0
         if len(self.trajectory) > 70:
@@ -93,8 +93,8 @@ class BasicWrapper(gym.Wrapper):
         """
         if len(self.trajectory) == 0:
             return reward
-        if len(self.trajectory) > short_traj_len:
-            short_traj = shorten_trajectory(self.trajectory.tolist())
+        if len(self.trajectory) > SHORT_TRAJ_LEN + 3:
+            short_traj = resize(self.trajectory.tolist())
             print(short_traj)
         else:
             short_traj = self.trajectory.copy()
@@ -107,7 +107,7 @@ class BasicWrapper(gym.Wrapper):
         preds = self.model.predict(d).predictions[0][0]
         pred_label = np.argmax(preds)
         soft = softmax(preds)
-        np.round(soft, 2)
+        soft = np.round(soft, 3)
         print(soft)
         print('pred label: ', pred_label)
         score = 0 * soft[0] + 0.25 * soft[1] + 0.5 * soft[2] + 0.75 * soft[3] + 1 * soft[4]

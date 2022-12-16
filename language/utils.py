@@ -9,12 +9,16 @@ from transformers import EvalPrediction
 
 from multimodal_transformers.data.tabular_torch_dataset import TorchTabularTextDataset
 
+from sklearn.preprocessing import QuantileTransformer, PowerTransformer
+
+
 
 ACTION_WORDS = ['STAND', 'JUMP', 'UP', 'RIGHT', 'LEFT', 'DOWN', 'UP-RIGHT', 'UP-LEFT', 'DOWN-RIGHT', 'DOWN-LEFT', 'JUMP UP', 'JUMP RIGHT', 'JUMP LEFT', 'JUMP DOWN', 'JUMP UP-RIGHT', 'JUMP UP-LEFT', 'JUMP DOWN-RIGHT', 'JUMP DOWN-LEFT']
-SHORT_TRAJ_LEN = 10
+SIMPLIFIED_ACTIONS = ['STAND', 'JUMP', 'UP', 'RIGHT', 'LEFT', 'DOWN', 'RIGHT', 'LEFT', 'RIGHT', 'LEFT', 'JUMP', 'JUMP RIGHT', 'JUMP LEFT', 'JUMP DOWN', 'JUMP RIGHT', 'JUMP LEFT', 'JUMP RIGHT', 'JUMP LEFT']
+
+SHORT_TRAJ_LEN = 15
 
 action_words = ACTION_WORDS # used these already
-short_traj_len = SHORT_TRAJ_LEN
 
 text_cols = ['description', 'short_traj']
 label_list = ['0', '1', '2', '3', '4']
@@ -31,17 +35,34 @@ column_info_dict = {
 
 data_args = MultimodalDataTrainingArguments(
     data_path='data/new_split/',
-    combine_feat_method='individual_mlps_on_cat_and_numerical_feats_then_concat',
+    combine_feat_method='gating_on_cat_and_num_feats_then_sum',
     column_info=column_info_dict,
     task='classification',
     categorical_encode_type='none'
 )
 
 
-def make_action_frequency_vector(trajectory:ndarray):
-    # count occurences of 0 in trajectory
-    frequencies = [round(np.count_nonzero(trajectory == x) / len(trajectory), ndigits=2) for x in range(18)]
+def make_action_frequency_vector(trajectory):
+    # count occurences of every element in trajectory
+    if isinstance(trajectory, list):
+        trajectory = np.array(trajectory)
+    l = len(trajectory)
+    frequencies = np.array([round(np.count_nonzero(trajectory == i) / l, 2) for i in range(18)])
     return frequencies
+
+
+def traj_to_words(trajectory, simple=False):
+    """Convert trajectory to words
+    Args:
+        trajectory: Trajectory
+    Returns:
+        _type_: List of words
+    """
+    if simple:
+        words = [SIMPLIFIED_ACTIONS[x] for x in trajectory]
+    else:
+        words = [ACTION_WORDS[x] for x in trajectory]
+    return words
 
 
 def calc_classification_metrics(p: EvalPrediction):
@@ -56,6 +77,7 @@ def calc_classification_metrics(p: EvalPrediction):
     pred_scores = softmax(p.predictions[0], axis=1)
     labels = p.label_ids
     acc = (pred_labels == labels).mean()
+    num_fours = np.count_nonzero(pred_labels == 4)
     relacc = [1 if 
               # both are the same or both are non-zero
               (pred_labels[i] == labels[i] 
@@ -65,11 +87,14 @@ def calc_classification_metrics(p: EvalPrediction):
     result = {
         "acc": acc,
         'relacc': relacc,
+        "num_fours": num_fours,
         "mcc": matthews_corrcoef(labels, pred_labels)
         }
 
     return result
 
+
+numerical_transformer = QuantileTransformer(output_distribution='normal')
 
 def get_torch_data(description,
                   short_traj,
@@ -84,12 +109,17 @@ def get_torch_data(description,
     Returns:
         :obj:`tabular_torch_dataset.TorchTextDataset`: The converted dataset
     """
+    
     if action_freqs is None:
         if trajectory is None:
             raise ValueError('Either trajectory or action_freqs must be provided')
         action_freqs = make_action_frequency_vector(trajectory)
     
+    
     action_freqs = np.array([action_freqs, action_freqs])
+    
+    # transformer = numerical_transformer.fit(action_freqs)
+    # action_freqs = transformer.transform(action_freqs)
     # action_freqs = action_freqs.astype(float)
     
     description = [description, description]

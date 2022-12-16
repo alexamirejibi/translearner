@@ -2,7 +2,7 @@ import preprocessing as pre
 import pickle
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, TrainingArguments, Trainer
 import random
-from shorten_trajectory import shorten_trajectory
+from keep_common_actions import keep_common_actions
 import torch
 import evaluate
 import numpy as np
