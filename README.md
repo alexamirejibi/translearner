@@ -46,5 +46,5 @@ huggingface-cli login
 
 Ready to train:
 ```
-python language/multimodal-model.py --save_repo "your_hf_username/repo_name"
+python language/multimodal_model.py --save_repo "your_hf_username/repo_name"
 ```
