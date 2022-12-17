@@ -7,15 +7,17 @@ import random
 from collections import Counter
 
 
-# def make_action_frequency_vector(trajectory):
-#     frequencies = [round(trajectory.count(x) / len(trajectory), ndigits=2) for x in range(18)]
-#     return frequencies
-
-
 def resize(traj, scale_to_n=SHORT_TRAJ_LEN):
+    """ Resize a trajectory to a given length. All trajectories are resized to the same length.
+
+    Args:
+        traj (_type_): Trajectory, list of actions.
+        scale_to_n (_type_, optional): New trajectory length to scale to. Defaults to SHORT_TRAJ_LEN.
+
+    Returns:
+        _type_: New trajectory
+    """
     trajectory = traj.copy()
-    # print('-------------------------')
-    # print('original:', trajectory)
     
     if isinstance(trajectory, np.ndarray):
         trajectory = trajectory.tolist()
@@ -24,22 +26,29 @@ def resize(traj, scale_to_n=SHORT_TRAJ_LEN):
     
     if len(trajectory) == 0:
         return trajectory
-
-    # if len(trajectory) > scale_to_n:
-    #     trajectory = proportional_shorten(trajectory)
         
     if len(trajectory) > scale_to_n:
         trajectory = keep_common_actions(trajectory, SHORT_TRAJ_LEN + 10)
     
     t = randomly_resize_to_scale(trajectory, scale_to_n)
-    # print('final:', t)
-    # print('-------------------------')
+
     return t
 
 
 max_traj_length = SHORT_TRAJ_LEN
     
 def proportional_shorten(trajectory, scale_to_n=SHORT_TRAJ_LEN):
+    """ Shorten a trajectory by shortening sequences of actions proportionally to their length.
+
+    Args:
+        trajectory (_type_): Trajectory
+        scale_to_n (_type_, optional): Desired length of new trajectory. Defaults to SHORT_TRAJ_LEN.
+
+    Returns:
+        _type_: New trajectory
+    """
+    
+    # how much to shrink each sequence and therefore trajectory as a whole
     shrink_factor = scale_to_n / len(trajectory)
 
     split_sequences = []
@@ -89,8 +98,9 @@ def keep_common_actions(trajectory, scale_to_n=SHORT_TRAJ_LEN):
         
     return downsampled_actions
 
-def randomly_resize_to_scale(trajectory, scale_to_n=SHORT_TRAJ_LEN):
 
+def randomly_resize_to_scale(trajectory, scale_to_n=SHORT_TRAJ_LEN):
+    # randomly remove or add actions to trajectory until it is the right length
     while len(trajectory) > scale_to_n:
         trajectory.pop(random.randint(0, len(trajectory)-1))
     
@@ -100,25 +110,13 @@ def randomly_resize_to_scale(trajectory, scale_to_n=SHORT_TRAJ_LEN):
         random_ind = random.randint(0, len(trajectory)-1)
         trajectory.insert(random_ind, trajectory[random_ind])
         
-    return trajectory
-
-
-def divide_and_shorten(trajectory, splits=2, sofar=0):
-    # # print(trajectory)
-    if splits == 0:
-        tmp = keep_common_actions(trajectory, scale_to_n=int(SHORT_TRAJ_LEN/(2 * sofar + 1)))
-        # # print('final ', tmp)
-        return tmp
-    
-    if splits > 0:
-        m = int(len(trajectory) / 2)
-        return divide_and_shorten(trajectory[:m], splits-1, sofar+1) + divide_and_shorten(trajectory[m:], splits-1, sofar+1)
-    
+    return trajectory    
     
     
 # ---------------------------------------------
 
 def shorten_traj_recency(trajectory):
+    # Not used
     max_traj_length = 10
     length = len(trajectory)
 
@@ -127,7 +125,6 @@ def shorten_traj_recency(trajectory):
         return trajectory
 
     traj_len = len(trajectory)
-    # # print(trajectory)
 
 
     split_sequences = []
@@ -178,6 +175,7 @@ def shorten_traj_recency(trajectory):
 
 
 def expand_trajectory(trajectory):
+    # Not used
     split_sequences = []
     tmp = []
     for i in range(len(trajectory)):
@@ -219,6 +217,7 @@ def find_total_length(split_sequences):
 
 
 def shorten_trajectory_fully(trajectory):
+    # Not used
     new_trajectory = []
     trajectory = [x for x in trajectory if x != 0]
     for i in range(len(trajectory)):
@@ -233,4 +232,3 @@ def shorten_trajectory_fully(trajectory):
 # print(data)
 # data = [1, 2, 3, 4, 4, 4, 4, 4]
 # print(resize(data))
-# print(make_action_frequency_vector(data))

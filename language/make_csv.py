@@ -1,15 +1,11 @@
 import csv
 import pickle
-from utils import action_words
+from utils import ACTION_WORDS
 
 with open('data/new_augmented_data_5_labels.pkl', 'rb') as d:
     data = pickle.load(d)
 
-# open the file in the write mode
-# 
-# header = ['description', 'label', 'short_traj', '0', '1', '2', '3', '4', '5', '6', '7', '8',
-#           '9', '10', '11', '12', '13', '14', '15', '16', '17']
-header = ['description', 'label', 'short_traj'] + action_words
+header = ['description', 'label', 'short_traj'] + ACTION_WORDS
 
 data_d = []
 

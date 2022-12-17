@@ -3,6 +3,11 @@ import json
 from typing import Optional
 
 
+'''
+Multimodal transformer model arguments
+From the jupyter notebook on the multimodal transformers github
+'''
+
 @dataclass
 class ModelArguments:
   """

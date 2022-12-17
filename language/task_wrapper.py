@@ -13,37 +13,29 @@ from transformers import pipeline
 
 
 class TaskWrapper(gym.Wrapper):
+    """ 
+    Wrapper for gym environments that adds a task to the environment.
+    """
     def __init__(self, env:gym.Env, save_data=True, save_path:str=""):
         super().__init__(env)
-        # task_dict = {0: DownLadderJumpRight, 1: ClimbDownRightLadder, 2: JumpSkullReachLadder, 3: JumpSkullGetKey, 4: ClimbLadderGetKey, 5: ClimbDownGoRightClimbUp, 6: JumpMiddleClimbReachLeftDoor}
-        # tsk = task_dict[task_id]
-        # self.task = tsk
         self.task = None
         self.env = env
         self.env.reset()
-        self.n_steps = 0
+        self.n_steps = 0 # steps so far
         self.env = env
         self.successes = 0
         self.log_interval = 1000
         self.save_data = save_data
         self.save_path = save_path
         self.start_lives = None
-        # make empty 2d numpy array
         self.successes_array = np.empty((0,2), int)
-        # self.trajectory = []
-        # self.model = pipeline(model="alexamiredjibi/trajectory-classifier2")
-        # self.instruction = instruction
-        # self.highest_lang_reward = 0
-        # self.lang_coefficient = lang_coefficient
-        # self.action_words = ['STAND', 'JUMP', 'UP', 'RIGHT', 'LEFT', 'DOWN', 'UP-RIGHT', 'UP-LEFT',
-        # 'DOWN-RIGHT', 'DOWN-LEFT', 'JUMP UP', 'JUMP RIGHT', 'JUMP LEFT', 'JUMP DOWN', 'JUMP UP-RIGHT',
-        # 'JUMP UP-LEFT', 'JUMP DOWN-RIGHT', 'JUMP DOWN-LEFT']
     
     def get_task(self, task_id):
         task_dict = {0: DownLadderJumpRight, 1: ClimbDownRightLadder, 2: JumpSkullReachLadder, 3: JumpSkullGetKey, 4: ClimbLadderGetKey, 5: ClimbDownGoRightClimbUp, 6: JumpMiddleClimbReachLeftDoor}
         return task_dict[task_id](self)
     
     def assign_task(self, task):
+        # need to do this after init
         self.task = task
         print('task assigned: ', self.task)
         self.task.reset()
@@ -51,19 +43,18 @@ class TaskWrapper(gym.Wrapper):
 
     def step(self, action):
         next_state, reward, done, info = self.env.step(action)
-        #print('step')
         if self.start_lives != None and self.env.ale.lives() < self.start_lives:
-            # print('lost a life, current lives: ', self.env.ale.lives())
-            # print('start lives: ', self.start_lives)
             next_state = self.reset()
-        # modify ...q
         self.n_steps += 1
-        #print(self.n_steps)
+        
+        # check if task is finished and update success count, return 1 as reward (well done agent)
         if self.task != None and self.task.finished():
             self.successes = self.successes + 1
             reward = max(reward, 1)
             print('task finished, reward: ', reward)
             next_state = self.reset()
+        
+        # save data every 2048 steps
         if (self.n_steps % 2048 == 0 or self.n_steps == 100) and self.save_data:
             a = np.array([[self.n_steps, self.successes]])
             self.successes_array = np.concatenate((self.successes_array, a), axis=0)
@@ -71,97 +62,84 @@ class TaskWrapper(gym.Wrapper):
             self.save_data_file()
         return next_state, reward, done, info
 
+
     def reset(self):
         return self.task.reset()
         
     
     def finished(self):
+        # check if task is finished
         return self.task.finished()
     
-    def add_task(self, task):
-        self.task = task(self)
 
     def reached_pos(self, x_, y_):
+        # check if agent is at position (x_, y_)
         x, y = self.agent_pos()
         return (x_ - 5 <= x <= x_ + 5) and (y_ - 5 <= y <= y_ + 5)
     
     def get_data(self):
+        # return (n_steps, total successes) array
         return self.successes_array
 
     def save_data_file(self):
+        # save data to file (.npy)
         np.save(self.save_path, self.successes_array)
         print('-=-=saved data in:', self.save_path, '=-=-')
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-    def new_game(self, from_random_game=False):
-            self._screen = self.env.reset()
-            self._step(0)
-            self.initial_frame = None
-            return self.screen, 0, 0, self.terminal
-
-    # def new_random_game(self):
-    #     self.new_game(True)
-    #     for _ in xrange(random.randint(0, RANDOM_START - 1)):
-    #         self._step(0)
-    #     return self.screen, 0, 0, self.terminal
 
     def agent_pos(self):
+        # get agent position
         x, y = self.env.ale.getRAM()[42:44]
         return int(x), int(y)
 
     def skull_pos(self):
+        # get skull position
         return int(self.env.ale.getRAM()[47])
 
     def room(self):
+        # get room number
         return int(self.env.ale.getRAM()[3])
 
     def has_key(self):
+        # check if agent has key
         return int(self.env.ale.getRAM()[101])
 
     def orb_collected(self):
+        # check if orb is collected
         return int(self.env.ale.getRAM()[49])
-
-    def save_state(self, filename):
-            state = self.env.clone_state()
-            np.save(filename, state)
-            print ('File written : {}'.format(filename))
-
-    def load_state(self, filename):
-            state = np.load(filename)
-            self.env.restore_state(state)
-            self.step(0)
 
     def repeat_action(self, action, n=1):
         for _ in range(n):
             self.step(action)
 
-    def inspect(self):
-        screen = self.env.ale.getScreenRGB()
-        img = Image.fromarray(screen.astype('uint8'))
-        img.save('trajectory/'+str(self.n_steps)+'.png')
-        if self.n_steps > 100:
-            input('Done')
+    # def inspect(self):
+    #     screen = self.env.ale.getScreenRGB()
+    #     img = Image.fromarray(screen.astype('uint8'))
+    #     img.save('trajectory/'+str(self.n_steps)+'.png')
+    #     if self.n_steps > 100:
+    #         input('Done')
 
-    def new_expt(self):
-        if self.args.expt_id == 1:
-            self.task = ClimbDownRightLadder(self)
-        elif self.args.expt_id == 2:
-            self.task = JumpSkullReachLadder(self)
-        elif self.args.expt_id == 3:
-            self.task = ClimbLadderGetKey(self)
-        elif self.args.expt_id == 4:
-            self.task = ClimbDownGoRightClimbUp(self)
-        elif self.args.expt_id == 5:
-            self.task = JumpMiddleClimbReachLeftDoor(self)
+    # def new_expt(self):
+    #     if self.args.expt_id == 1:
+    #         self.task = ClimbDownRightLadder(self)
+    #     elif self.args.expt_id == 2:
+    #         self.task = JumpSkullReachLadder(self)
+    #     elif self.args.expt_id == 3:
+    #         self.task = ClimbLadderGetKey(self)
+    #     elif self.args.expt_id == 4:
+    #         self.task = ClimbDownGoRightClimbUp(self)
+    #     elif self.args.expt_id == 5:
+    #         self.task = JumpMiddleClimbReachLeftDoor(self)
             
-        self._step(0)
-        self._step(0)
-        self._step(0)
-        self._step(0)
-        for _ in range(random.randint(0, RANDOM_START - 1)):
-            self._step(0)
+    #     self._step(0)
+    #     self._step(0)
+    #     self._step(0)
+    #     self._step(0)
+    #     for _ in range(random.randint(0, RANDOM_START - 1)):
+    #         self._step(0)
 
-        return self.screen, 0, 0, self.terminal
+    #     return self.screen, 0, 0, self.terminal
         
 
     # def _step(self, action):
@@ -223,32 +201,3 @@ class TaskWrapper(gym.Wrapper):
             self.reset()
 
         return self.state, goal_reached
-
-
-
-
-# class ObservationWrapper(gym.ObservationWrapper):
-#     def __init__(self, env):
-#         super().__init__(env)
-    
-#     def observation(self, obs):
-#         # modify obs
-#         return obs
-    
-# class RewardWrapper(gym.RewardWrapper):
-#     def __init__(self, env):
-#         super().__init__(env)
-    
-#     def reward(self, rew):
-#         # modify rew
-#         return rew
-    
-# class ActionWrapper(gym.ActionWrapper):
-#     def __init__(self, env):
-#         super().__init__(env)
-    
-#     def action(self, act):
-#         # modify act
-#         return act
-
-# env = BasicWrapper(gym.make("CartPole-v0"))
