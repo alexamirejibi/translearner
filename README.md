@@ -14,6 +14,7 @@ cd Multimodal-Toolkit && pip install .
 To train RL agent:
 ```
 python main.py --task 2
+
 options:
   -h, --help            show this help message and exit
   --task TASK           task number 0-6{0: <class 'language.tasks.DownLadderJumpRight'>, 1: <class 'language.tasks.ClimbDownRightLadder'>, 2: <class
