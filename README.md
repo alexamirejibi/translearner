@@ -35,6 +35,16 @@ options:
 ```
 
 To train TransLEARNer model:
+You'll need to push it to the Huggingface hub, so log in with your token before you do this.
+
+Log in:
+```
+pip install huggingface_hub
+git config --global credential.helper store
+huggingface-cli login
+```
+
+Ready to train:
 ```
 python language/multimodal-model.py --save_repo "your_hf_username/repo_name"
 ```
