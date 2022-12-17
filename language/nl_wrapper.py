@@ -88,7 +88,7 @@ class Translearner(gym.Wrapper):
             self.time = 0
         if action != 0:
             self.trajectory = np.append(self.trajectory, action)
-        if self.time == 34 and len(self.trajectory) > 0 and self.use_lang_rewards:
+        if self.time == 20 and len(self.trajectory) > 0 and self.use_lang_rewards:
             reward = self.get_lang_reward(reward)
             self.time = 0
         if len(self.trajectory) > 70:
