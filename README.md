@@ -12,6 +12,7 @@ cd Multimodal-Toolkit && pip install .
 ```
 
 To train RL agent:
+(Note: 
 ```
 python main.py --task 2
 
@@ -24,6 +25,8 @@ options:
   --lang_rewards LANG_REWARDS
                         'true' = use language rewards (default)
                         'false' (or anything else = don't use language rewards
+  --lang_reward_interval LANG_REWARD_INTERVAL
+                        interval for reward calculation
   --timesteps TIMESTEPS
                         number of timesteps to play
   --render RENDER       render mode - 'true' / 'false' (defaults to 'false')
@@ -33,6 +36,9 @@ options:
   --save_folder SAVE_FOLDER
                         save path for task logs
   --device DEVICE       device
+  
+  
+  
 ```
 
 To train TransLEARNer model:
