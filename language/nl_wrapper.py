@@ -120,7 +120,7 @@ class Translearner(gym.Wrapper):
         if len(self.trajectory) == 0:
             return reward
         
-        if len(self.trajectory) > SHORT_TRAJ_LEN + 3:
+        if len(self.trajectory) != SHORT_TRAJ_LEN:
             # resize the trajectory to be exactly 15 actions long
             short_traj = resize(self.trajectory.tolist())
         else:
