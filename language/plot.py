@@ -5,8 +5,8 @@ import numpy as np
 
 
 # load numpy array from npy file
-task = 4
-data_lang = np.load('data/final_results/task-{}-lang-true.npy'.format(task))
+task = 3
+data_lang = np.load('data/final_results/task-{}-lang-true-0.05.npy'.format(task))
 data_ext = np.load('data/final_results/task-{}-lang-false.npy'.format(task))
 
 # while the 0th dimension of data_ext doesn't match the 0th dimension of data_lang, remove the last element of data_ext
@@ -41,8 +41,8 @@ plt.plot(data_ext.T[0], data_ext.T[1], label='Only external', color='blue')
 #plt.annotate('lang', (data_lang.T[0][-1], data_lang.T[1][-1]), color='red')
 # draw labels on axis and set title
 ax.set_xlabel('Timesteps')
-ax.set_ylabel('Reward')
-ax.set_title('Task {}: Reward vs Timesteps'.format(task))
+ax.set_ylabel('Successful episodes')
+ax.set_title('Task {}: Successful episodes vs Timesteps'.format(task))
 # add subtitle
 ax.legend()
 # color areas under curve
@@ -53,12 +53,12 @@ ax.fill_between(data_ext.T[0], data_ext.T[1], color='blue', alpha=0.2)
 ax.annotate(data_lang[-1][-1], (data_lang.T[0][-1], data_lang.T[1][-1]), color='red')
 ax.annotate(data_ext[-1][-1], (data_ext.T[0][-1], data_ext.T[1][-1]), color='blue')
 
-#plt.show()
+plt.show()
 
 # save plot info 
-#fig.savefig('data/figures/task-{}.png'.format(task))
-#ax.plot(np.array([1, 2, 3, 4]), np.array([1, 4, 10, 50]));  # Plot some data on the axes.
-#ax.plot([1, 2, 3, 4], [4, 3, 2, 1]);  # Plot some data on the axes.
+fig.savefig('data/figures/task-{}.png'.format(task))
+# ax.plot(np.array([1, 2, 3, 4]), np.array([1, 4, 10, 50]));  # Plot some data on the axes.
+# ax.plot([1, 2, 3, 4], [4, 3, 2, 1]);  # Plot some data on the axes.
 
 # # display the plot
 # plt.show()

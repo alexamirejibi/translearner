@@ -24,10 +24,7 @@ class Task(object):
     self.env.env.reset()
     self.env.env.restore_state(newState)
     obs, _, _, _ = self.env.step(0)
-    #print('reset at {}'.format(self.env.n_steps))
-    #print('task reset: ', self)
     return obs
-    # self.start = self.env.load_state('game_state_ckpts/{}.npy'.format(start))
     
 class DownLadderJumpRight(Task):
   def __init__(self, env):

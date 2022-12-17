@@ -96,6 +96,8 @@ fully_random_traj = [] # sent + fully random trajectory
 random_traj_noise_30 = [] # 1/3 noise + incorrect sent
 random_traj_noise_50 = [] # 1/2 noise + incorrect sent
 random_traj_noise_75 = [] # 3/4 noise + incorrect sent
+
+# these two weren't used because I ......... forgot to append them to the final list .......
 correct_freqs_incorrect_short_traj = [] # sent + random trajectory from data + random frequencies
 incorrect_freqs_correct_short_traj = [] # sent + random trajectory from data + random frequencies
 for i in full_data:
@@ -171,8 +173,8 @@ for i in range(10):
 
 
 # save new_full_data as pickle
-with open('data/new_augmented_data_5_labels.pkl', 'wb') as f:
-    pickle.dump(new_full_data, f)
+# with open('data/new_augmented_data_5_labels.pkl', 'wb') as f:
+#     pickle.dump(new_full_data, f)
 
 
 
