@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Optional
 
+import argparse
+
 import numpy as np
 import pandas as pd
 from transformers import (
@@ -18,6 +20,15 @@ from multimodal_transformers.model import AutoModelWithTabular
 from utils import *
 
 from dclasses import ModelArguments, MultimodalDataTrainingArguments
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--data_path", type=str, default="data/new_split", help="the path to the csv folder containing the train/val/test datasets")
+parser.add_argument("--save_repo", type=str, default="multimodal-traj-class-no-numtransform", help="the path to the HF repository where the model will be saved")
+
+
+args = parser.parse_args()
+
+
 
 train_df = pd.read_csv('data/new_split/train.csv')
 val_df = pd.read_csv('data/new_split/val.csv')
@@ -72,7 +83,7 @@ model = AutoModelWithTabular.from_pretrained(
 
 
 training_args = TrainingArguments(
-    output_dir="multimodal-traj-class-no-numtransform",
+    output_dir=args.save_repo,
     overwrite_output_dir=True,
     do_train=True,
     do_eval=True,
