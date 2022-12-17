@@ -24,7 +24,7 @@ parser.add_argument('--task', type=int, default=2, help='task number 0-6'+str(ta
 parser.add_argument('--lang_rewards', type=str, default='true', help='true = use language rewards (default) - false (or anything else = don\'t use language rewards')
 parser.add_argument('--timesteps', type=int, default=500000, help='number of timesteps to play')
 parser.add_argument('--lang_reward_interval', type=int, default=10, help='interval for reward calculation')
-parser.add_argument('--render', type=str, default='false', help='render mode - 'true' / 'false' (defaults to 'false')')
+parser.add_argument('--render', type=str, default='false', help='render mode - \'true\' / \'false\' (defaults to false')
 parser.add_argument('--instr', type=str, default='none', help='provide a list of instructions separated by "[SEP]" (ex. "go left and jump [SEP] jump left [SEP] left jump")')
 parser.add_argument('--lang_coef', type=float, default=0.05, help='language reward coefficient (language rewards are multiplief by the coefficient)')
 # save path arg
