@@ -5,7 +5,7 @@ from utils import *
 
 from scipy.special import softmax
 
-
+from transformers import EvalPrediction
 import torch 
 from multimodal_transformers.model import BertWithTabular, AutoModelWithTabular, DistilBertWithTabular
 from multimodal_transformers.model import TabularConfig
@@ -21,8 +21,8 @@ from sklearn.preprocessing import PowerTransformer, QuantileTransformer
 
 text_cols = ['description', 'short_traj']
 cat_cols = []
-from utils import ACTION_WORDS
-numerical_cols = ACTION_WORDS
+from utils import action_words
+numerical_cols = action_words
 
 column_info_dict = {
     'text_cols': text_cols,
@@ -135,77 +135,70 @@ action_freqs = np.array([0., 0.05, 0.04, 0.04, 0.07, 0.05, 0.05, 0.09, 0.11, 0.0
   0.07, 0.04, 0.11, 0.04])
 d = get_torch_data(descriptions, "LEFT, RIGHT, JUMP RIGHT, LEFT, JUMP RIGHT, LEFT, LEFT, LEFT, JUMP RIGHT, JUMP RIGHT, RIGHT, LEFT, LEFT, LEFT, LEFT", tokenizer=tokenizer, action_freqs=action_freqs)#trajectory=np.array([4, 4, 4, 4, 4, 4, 13, 4, 4, 4, 4, 4]))
 # get_prediction(d)
-preds = trainer.predict(d)[0][0]
-preds = softmax(preds[0])
-print(np.round(preds, 3))
-print(np.argmax(preds))
+# preds = trainer.predict(d)[0][0]
+# preds = softmax(preds[0])
+# print(np.round(preds, 3))
+# print(np.argmax(preds))
 # preds = np.average(preds, axis=0)
 # preds = np.round(preds, 4)
 # score = 0.1 * preds[1] + 0.2 * preds[2] + 0.3 * preds[3] + 0.4 * preds[4]
 # print(score)
 
+# print(test_dataset[:500].keys())
+pred_labels = np.array([])
+ac_labels = np.array([])
+print(testset.keys())
+print(testset.iloc[0].to_numpy()[-18:])
+
+acc = 0
+relacc = 0
+n = 100
+label1_acc = 0
+total1 = 0
+
+""" This is a little test to see if my data loading method is working correctly.
+It passes on the test set with 75% accuracy, and 87% binary accuracy in guessing
+whether data is positive or negative (1,2,3,4 or 0).
+
+And yet the predictions are still not good in practice. I am fairly certain that my
+implementation of the gym wrapper is correct. I also think the training data is fairly
+good for the task. I am not sure what is going wrong.
+"""
+
+for i in range(n):
+    label = testset['label'].iloc[i]
+    ac_labels = np.append(ac_labels, label)
+    # print(i.values)
+    short_traj = testset['short_traj'].iloc[i]
+    description = testset['description'].iloc[i]
+    action_freqs = testset.iloc[i].to_numpy()[-18:]
+    action_freqs = action_freqs.astype(float)
+    d = get_torch_data([description, description, description], short_traj, tokenizer=tokenizer, action_freqs=action_freqs)
+    preds = trainer.predict(d)[0][0]
+    print(description, short_traj, action_freqs, label)
+    preds = softmax(preds[0])
+    pred_label = np.argmax(preds)
+    print('preds', preds, 'label', pred_label)
+    acc = acc + (pred_label == label)
+    relacc = relacc + (1 if (pred_label == label or (pred_label > 0 and label > 0))
+                       else 0)
+    total1 = total1 + (1 if label == 1 else 0)
+    label1_acc = label1_acc + (1 if (pred_label <= 1 and label == 1) else 0)
+    # pred_labels = np.append(pred_labels, pred_label)
+
+print('acc', acc / n)
+print('relacc', relacc / n)
+print('label1_acc', label1_acc / total1)
+print('TEST SUCCESSFUL' if acc / n > 0.70 else 'TEST FAILED', 'acc', acc / n)
+# acc = 0
+# for i in range(100):
+#     print(pred_labels[i], ac_labels[i])
+#     acc = acc + (pred_labels[i] == ac_labels[i])
+    
+# print(acc/100)
+
+# ev = EvalPrediction(predictions=pred_labels, label_ids=ac_labels)
+# print(calc_classification_metrics(ev))
 
 print(' ------------------ ------------------')
-# print(trainer.evaluate(tor_data))
-# d = get_torch_data('go right and down the ladder', "LEFT, UP, LEFT, JUMP-LEFT, UP, DOWN, LEFT, RIGHT, UP", tokenizer=tokenizer, trajectory=np.array([4, 4, 4, 4, 4, 4, 13, 4, 4, 4, 4, 4]))
-
-# with torch.no_grad():
-#     preds = trainer.predict(d).predictions[0][0]
-#     print(softmax(preds), np.argmax(preds))
-
-# print(np.argmax(preds[0]))
-# print(softmax(preds[0]))
-
-
-
-# with torch.no_grad():
-#     _, logits, classifier_outputs = model(
-#         model_inputs['input_ids'],
-#         attention_mask=model_inputs['attention_mask'],
-#         cat_feats=None,
-#         #token_type_ids = model_inputs['token_type_ids'],
-#         numerical_feats=model_inputs['numerical_feats']
-#     )
-
-
-#print(trainer.evaluate())
-
-# model_inputs = test_dataset[0]
-# print(model_inputs.keys())
-# print(model_inputs['numerical_feats'].size())
-# print(model_inputs)
-# print(model)
-# with torch.no_grad():
-#     _, logits, classifier_outputs = model(
-#         model_inputs['input_ids'],
-#         attention_mask=model_inputs['attention_mask'],
-#         cat_feats=None,
-#         #token_type_ids = model_inputs['token_type_ids'],
-#         numerical_feats=model_inputs['numerical_feats']
-#     )
-
-# print(classifier_outputs)
-
-
-#preds, label_ids, metrics = trainer.predict(test_dataset)
-
-#print(preds)
-#print(trainer.evaluate())
-
-# save predictions
-#np.save('preds.npy', preds)
-
-# load predictions
-# np.load('preds.npy', allow_pickle=True)
-
-# # preds vs label_ids
-# correct = 0
-# total = 0
-# for i in range(len(preds)):
-#     if preds[i] == label_ids[i]:
-#         #print("Correct")
-#         correct += 1
-#     total += 1
-
-# print("Accuracy: ", correct/total)
         
