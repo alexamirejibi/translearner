@@ -26,6 +26,7 @@ class Translearner(gym.Wrapper):
         self.total_time = 0
         self.env = env
         self.trajectory = trajectory
+        self.reward_interval = args.lang_reward_interval
         self.model = self.init_translearner()
         self.tokenizer = DistilBertTokenizerFast.from_pretrained('distilbert-base-uncased')
         self.instructions = self.split_instructions(args.instr) if args.instr != 'none' else instructions 
@@ -88,7 +89,7 @@ class Translearner(gym.Wrapper):
             self.time = 0
         if action != 0:
             self.trajectory = np.append(self.trajectory, action)
-        if self.time == 20 and len(self.trajectory) > 0 and self.use_lang_rewards:
+        if self.time == self.reward_interval and len(self.trajectory) > 0 and self.use_lang_rewards:
             reward = self.get_lang_reward(reward)
             self.time = 0
         if len(self.trajectory) > 70:

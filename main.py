@@ -23,6 +23,7 @@ parser.add_argument('--task', type=int, default=2, help='task number 0-6'+str(ta
 #parser.add_argument('--lang_rewards', action=argparse.BooleanOptionalAction)
 parser.add_argument('--lang_rewards', type=str, default='true', help='use language rewards')
 parser.add_argument('--timesteps', type=int, default=500000, help='number of timesteps to play')
+parser.add_argument('--lang_reward_interval', type=int, default=20, help='interval for reward calculation')
 parser.add_argument('--render', type=str, default='false', help='use language rewards')
 parser.add_argument('--instr', type=str, default='none', help='instruction type')
 parser.add_argument('--lang_coef', type=float, default=0.6, help='language reward coefficient')
