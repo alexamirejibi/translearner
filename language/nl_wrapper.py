@@ -149,6 +149,6 @@ class Translearner(gym.Wrapper):
             print('softmaxed average:', soft_av)
             print('reward: ', reward)
             
-            return reward
+        return reward
 
 
