@@ -59,18 +59,11 @@ class TaskWrapper(gym.Wrapper):
         self.n_steps += 1
         #print(self.n_steps)
         if self.task != None and self.task.finished():
-            # print('task done')
-            # print('successes ', self.successes)
             self.successes = self.successes + 1
             reward = max(reward, 1)
+            print('task finished, reward: ', reward)
             next_state = self.reset()
-            # a = np.array([[self.n_steps, self.successes]])
-            # self.successes_array = np.concatenate((self.successes_array, a), axis=0)
-            # self.save_data_file()
-            # print('saved data cuz task fin')
-        # if (self.n_steps % 100 == 0):
-        #     print('pos ', self.agent_pos())
-        if (self.n_steps % 1024 == 0 or self.n_steps == 10) and self.save_data:
+        if (self.n_steps % 2048 == 0 or self.n_steps == 100) and self.save_data:
             a = np.array([[self.n_steps, self.successes]])
             self.successes_array = np.concatenate((self.successes_array, a), axis=0)
             print('n_steps: {} // successes: {} // success rate: {}'.format(self.n_steps, self.successes, (self.successes/self.n_steps) * 100))
@@ -96,7 +89,7 @@ class TaskWrapper(gym.Wrapper):
 
     def save_data_file(self):
         np.save(self.save_path, self.successes_array)
-        print('-=-=saved data=-=-')
+        print('-=-=saved data in:', self.save_path, '=-=-')
 
 # -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
     def new_game(self, from_random_game=False):

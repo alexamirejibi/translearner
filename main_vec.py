@@ -19,13 +19,13 @@ import argparse
 task_dict = {0: DownLadderJumpRight, 1: ClimbDownRightLadder, 2: JumpSkullReachLadder, 
             3: JumpSkullGetKey, 4: ClimbLadderGetKey, 5: ClimbDownGoRightClimbUp, 6: JumpMiddleClimbReachLeftDoor}
 parser = argparse.ArgumentParser()
-parser.add_argument('--task', type=int, default=1, help='task number 0-6'+str(task_dict))
+parser.add_argument('--task', type=int, default=2, help='task number 0-6'+str(task_dict))
 #parser.add_argument('--lang_rewards', action=argparse.BooleanOptionalAction)
 parser.add_argument('--lang_rewards', type=str, default='true', help='use language rewards')
 parser.add_argument('--timesteps', type=int, default=500000, help='number of timesteps to play')
 parser.add_argument('--render', type=str, default='false', help='use language rewards')
 parser.add_argument('--instr', type=str, default='none', help='instruction type')
-parser.add_argument('--lang_coef', type=float, default=0.2, help='language reward coefficient')
+parser.add_argument('--lang_coef', type=float, default=0.6, help='language reward coefficient')
 # save path arg
 parser.add_argument('--save_folder', type=str, default='data/train_log', help='save path')
 parser.add_argument('--device', type=str, default='cuda', help='save path')
@@ -56,7 +56,7 @@ log_save_path = '{}/task-{}-lang-{}.npy'.format(args.save_folder, args.task, arg
 
 env_name = "MontezumaRevengeNoFrameskip-v4"
 # env = gym.make(env_name)
-env = make_atari_env(env_name, n_envs=16, seed=0, parser_args=args, save_path=log_save_path)
+env = make_atari_env(env_name, seed=0, parser_args=args, save_path=log_save_path)
 
 
 
@@ -79,7 +79,7 @@ env = make_atari_env(env_name, n_envs=16, seed=0, parser_args=args, save_path=lo
 model = PPO("CnnPolicy", env, verbose=1, tensorboard_log="data/tensorboard/", device=args.device)
 model.learn(total_timesteps=args.timesteps)
 model.save("models/PPO-task-{}-lang-{}".format(args.task, args.lang_rewards))
-evaluate_policy(model, env)
+# evaluate_policy(model, env)
 
 # print(env.n_steps)
 # print(env.successes)
@@ -88,12 +88,10 @@ evaluate_policy(model, env)
 
 # episodes = 100
 # # time_steps = 0
-# max_time = 1000
+# # max_time = 1000
 # log_interval = 1000
 # num_finished = 0
 # while True:
-#     if env.n_steps > max_time:
-#         break
 #     task.reset()
 #     start_lives = task.env.lives
 #     env.step(0)
@@ -102,20 +100,16 @@ evaluate_policy(model, env)
 #     dead = False
 
 #     while not done:
+#         env.render()
 #         if env.lives < start_lives:
 #             done = True
-#         env.render()
 #         action = env.env.action_space.sample()
 #         n_state, reward, done, info = env.step(action)
 #         score+=reward
-#         time.sleep(0.01)
 #         num_finished = (num_finished + 1) if task.finished() else num_finished
 #         done = env.finished() or done
 #         if env.finished():
 #             print("finished task")
-#             time.sleep(2)
-#         if env.n_steps >= max_time:
-#             break
 #         #print(reward)
 #     # print('Episode:{} Score:{}'.format(episode, score))
 #     # print(env.agent_pos())
@@ -126,3 +120,4 @@ evaluate_policy(model, env)
 # print(num_finished)
 # env.save_data_file()
 # env.close()
+

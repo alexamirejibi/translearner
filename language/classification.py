@@ -33,7 +33,7 @@ column_info_dict = {
 
 data_args = MultimodalDataTrainingArguments(
     data_path='data/new_split/',
-    combine_feat_method='individual_mlps_on_cat_and_numerical_feats_then_concat',
+    combine_feat_method='gating_on_cat_and_num_feats_then_sum',
     column_info=column_info_dict,
     task='classification',
     categorical_encode_type='none'
@@ -55,17 +55,17 @@ train_dataset, val_dataset, test_dataset = load_data_from_folder(
     numerical_transformer_method='none'
 )
 
-num_labels = 5
-config = AutoConfig.from_pretrained('alexamiredjibi/Multimodal-Trajectory-Classifier')
+num_labels = len(np.unique(train_dataset.labels))
+config = AutoConfig.from_pretrained('alexamiredjibi/multimodal-traj-class-no-numtransform')
 tabular_config = TabularConfig(num_labels=num_labels,
                                # cat_feat_dim=train_dataset.cat_feats.shape[1],
-                               numerical_feat_dim=18,
+                               numerical_feat_dim=train_dataset.numerical_feats.shape[1],
                                **vars(data_args))
 
 config.tabular_config = tabular_config
 
-model = DistilBertWithTabular.from_pretrained(
-        'alexamiredjibi/Multimodal-Trajectory-Classifier',
+model = AutoModelWithTabular.from_pretrained(
+        'alexamiredjibi/multimodal-traj-class-no-numtransform',
         config=config,
         # cache_dir=model_args.cache_dir
     )
@@ -81,29 +81,30 @@ trainer = Trainer(
 testset = pd.read_csv('data/new_split/test.csv')
 
 # for i in range(5):
-#     tor_data = load_data(testset[:1],
-#                         text_cols=text_cols,
-#                         tokenizer=tokenizer,
-#                         label_col='label',
-#                         label_list=['0', '1', '2', '3', '4'],
-#                         categorical_encode_type='none',
-#                         numerical_cols=numerical_cols,
-#                         sep_text_token_str=tokenizer.sep_token,
-#                         debug=True)
+# tor_data = load_data(testset,
+#                     text_cols=text_cols,
+#                     tokenizer=tokenizer,
+#                     label_col='label',
+#                     label_list=['0', '1', '2', '3', '4'],
+#                     categorical_encode_type='none',
+#                     numerical_cols=numerical_cols,
+#                     sep_text_token_str=tokenizer.sep_token,
+#                     numerical_transformer='none',
+#                     debug=True)
 
 # print(tor_data[0].keys())
 # print(tor_data.__len__())
 
 print(' ------------------------------------')
-tor_data = load_data(testset,
-                    text_cols=text_cols,
-                    tokenizer=tokenizer,
-                    label_col='label',
-                    label_list=['0', '1', '2', '3', '4'],
-                    categorical_encode_type='none',
-                    numerical_cols=numerical_cols,
-                    sep_text_token_str=tokenizer.sep_token,
-                    debug=True)
+# tor_data = load_data(testset,
+#                     text_cols=text_cols,
+#                     tokenizer=tokenizer,
+#                     label_col='label',
+#                     label_list=['0', '1', '2', '3', '4'],
+#                     categorical_encode_type='none',
+#                     numerical_cols=numerical_cols,
+#                     sep_text_token_str=tokenizer.sep_token,
+#                     debug=True)
 
 # print(tor_data[0]['input_ids'].shape)
 
@@ -111,8 +112,8 @@ tor_data = load_data(testset,
 
 # print(predictions)
 
-print(trainer.evaluate(test_dataset))
-# print(trainer.evaluate(tor_data))
+# print(trainer.evaluate(test_dataset))
+# print(trainer.evaluate(test_dataset))
 
 # print('-----', np.argmax(predictions[0]))
 
@@ -126,10 +127,22 @@ def get_prediction(one_data):
     print(np.argmax(prediction))
     print(softmax(prediction))
     
-    
-# for i in range(10):
-#     d = get_torch_data(testset.iloc[i]['description'], testset.iloc[i]['short_traj'], tokenizer=tokenizer, action_freqs=np.array(testset.iloc[i][action_words]))
-#     get_prediction(d)
+descriptions=['go left and jump over the skull',
+                'go left and jump left over the skull to reach the ladder',
+                'goes left, jumps over the skull, goes left']
+i = 4
+action_freqs = np.array([0., 0.05, 0.04, 0.04, 0.07, 0.05, 0.05, 0.09, 0.11, 0.09, 0.05, 0.04, 0.04, 0.05,
+  0.07, 0.04, 0.11, 0.04])
+d = get_torch_data(descriptions, "LEFT, RIGHT, JUMP RIGHT, LEFT, JUMP RIGHT, LEFT, LEFT, LEFT, JUMP RIGHT, JUMP RIGHT, RIGHT, LEFT, LEFT, LEFT, LEFT", tokenizer=tokenizer, action_freqs=action_freqs)#trajectory=np.array([4, 4, 4, 4, 4, 4, 13, 4, 4, 4, 4, 4]))
+# get_prediction(d)
+preds = trainer.predict(d)[0][0]
+preds = softmax(preds[0])
+print(np.round(preds, 3))
+print(np.argmax(preds))
+# preds = np.average(preds, axis=0)
+# preds = np.round(preds, 4)
+# score = 0.1 * preds[1] + 0.2 * preds[2] + 0.3 * preds[3] + 0.4 * preds[4]
+# print(score)
 
 
 print(' ------------------ ------------------')

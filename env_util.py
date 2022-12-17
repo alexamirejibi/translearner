@@ -153,14 +153,10 @@ def make_atari_env(
 
     def atari_wrapper(env: gym.Env) -> gym.Env:
         env = AtariWrapper(env, **wrapper_kwargs)
-        if parser_args.lang_rewards == 'true':
-            env = Translearner(env, args=parser_args)
-        # env = BasicWrapper(env, args=parser_args)
-        env = TaskWrapper(env, save_data=True, save_path=save_path)
+        env = Translearner(env, args=parser_args)
+        env = TaskWrapper(env, save_path=save_path)
         task = task_dict[parser_args.task](env)
-        #print('task instance created: ', task)
         env.assign_task(task)
-        #print('task assigned to env: ', env)
         return env
 
     return make_vec_env(

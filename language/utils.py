@@ -96,7 +96,7 @@ def calc_classification_metrics(p: EvalPrediction):
 
 numerical_transformer = QuantileTransformer(output_distribution='normal')
 
-def get_torch_data(description,
+def get_torch_data(descriptions,
                   short_traj,
                   tokenizer,
                   trajectory=None,
@@ -116,17 +116,26 @@ def get_torch_data(description,
         action_freqs = make_action_frequency_vector(trajectory)
     
     
-    action_freqs = np.array([action_freqs, action_freqs])
-    
+    action_freqs = np.array([action_freqs])
+    # print('action freqs', action_freqs)
     # transformer = numerical_transformer.fit(action_freqs)
     # action_freqs = transformer.transform(action_freqs)
     # action_freqs = action_freqs.astype(float)
+    labels = np.array([])
+    short_trajectories = []
+    desc_short_traj = []
+    for i in descriptions:
+        desc_short_traj.append([i, short_traj])
+        short_trajectories.append(short_traj)
+        action_freqs = np.append(action_freqs, action_freqs, axis=0)
+        labels = np.append(labels, 0)
+        
+    for i, text in enumerate(desc_short_traj):
+        desc_short_traj[i] = f' {tokenizer.sep_token} '.join(text)
     
-    description = [description, description]
-    short_traj = [short_traj, short_traj]
+    # print(desc_short_traj)
     
-    hf_model_text_input = tokenizer(description, short_traj, padding=True, truncation=True)
-    labels = np.array([1, 1])
+    hf_model_text_input = tokenizer(desc_short_traj, padding=True, truncation=True)
 
     return TorchTabularTextDataset(hf_model_text_input,
                                    numerical_feats=action_freqs,
