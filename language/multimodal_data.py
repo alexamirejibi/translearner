@@ -140,7 +140,6 @@ for i in full_data:
 # -----------------------------------
 
 
-
 negative_data = random_traj_from_data + fully_random_traj + random_traj_noise_30 + random_traj_noise_50 + random_traj_noise_75
 positive_data = full_data + noise_30 + noise_50 + noise_75
 

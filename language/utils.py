@@ -55,7 +55,7 @@ def traj_to_words(trajectory, simple=False):
     """Convert trajectory to words
     Args:
         trajectory: Trajectory
-    Returns:
+    Returns
         _type_: List of words
     """
     if simple:
