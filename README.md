@@ -11,7 +11,7 @@ Additionally, make sure to install the requirements of the modified Multimodal-T
 cd Multimodal-Toolkit && pip install .
 ```
 
-To train model:
+To train RL agent:
 ```
 python main.py --task 2
 options:
@@ -32,4 +32,9 @@ options:
   --save_folder SAVE_FOLDER
                         save path for task logs
   --device DEVICE       device
+```
+
+To train TransLEARNer model:
+```
+python language/multimodal-model.py --save_repo "your_hf_username/repo_name"
 ```
