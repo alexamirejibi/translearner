@@ -45,6 +45,7 @@ class TaskWrapper(gym.Wrapper):
     
     def assign_task(self, task):
         self.task = task
+        print('task assigned: ', self.task)
         self.task.reset()
         self.start_lives = self.env.ale.lives()
 

@@ -40,9 +40,10 @@ class Translearner(gym.Wrapper):
     def split_instructions(self, instructions:str):
         # split instructions (separated by [SEP]) into a list of instructions
         instruction_list = []
-        for instruction in instructions.split('[SEP]'):
+        for instruction in instructions.split(' [SEP] '):
             instruction_list.append(instruction)
         print('given instructions: ', instruction_list)
+        return instruction_list
         
         
     def init_translearner(self):
