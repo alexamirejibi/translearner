@@ -12,7 +12,6 @@ cd Multimodal-Toolkit && pip install .
 ```
 
 To train RL agent:
-(Note: 
 ```
 python main.py --task 2
 
@@ -26,13 +25,14 @@ options:
                         'true' = use language rewards (default)
                         'false' (or anything else = don't use language rewards
   --lang_reward_interval LANG_REWARD_INTERVAL
-                        interval for reward calculation
+                        interval for reward calculation (default = 10)
   --timesteps TIMESTEPS
                         number of timesteps to play
   --render RENDER       render mode - 'true' / 'false' (defaults to 'false')
   --instr INSTR         provide a list of instructions separated by "[SEP]" (ex. "go left and jump [SEP] jump left [SEP] left jump")
   --lang_coef LANG_COEF
                         language reward coefficient (language rewards are multiplief by the coefficient)
+                        default = 0.05
   --save_folder SAVE_FOLDER
                         save path for task logs
   --device DEVICE       device
@@ -40,6 +40,8 @@ options:
   
   
 ```
+
+NOTE: optimal language reward coefficient will vary by task. If the amount of language rewards starts to grow at a fast pace and and the external rewards flatten out, the coefficient is too high.
 
 To train TransLEARNer model:
 You'll need to push it to the Huggingface hub, so log in with your token before you do this.
