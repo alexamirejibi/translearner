@@ -1,4 +1,4 @@
-# TransLEARNer: NLP-Aided RL That Sometimes Works
+# TransLEARNer: NLP-Aided RL
 
 
 To install requirements:
